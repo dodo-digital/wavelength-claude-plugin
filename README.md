@@ -19,7 +19,13 @@ git clone git@github.com:dodo-digital/wavelength-claude-plugin.git
 cd wavelength-claude-plugin
 ```
 
-2. Open Claude Code in this directory:
+2. Run the MCP setup script to configure external tool integrations:
+
+```bash
+./scripts/setup-mcps.sh
+```
+
+3. Open Claude Code in this directory:
 
 ```bash
 claude
@@ -45,6 +51,7 @@ Skills are modular capabilities that Claude Code can invoke. Each skill lives in
 
 | Skill | Purpose |
 |-------|---------|
+| `company-processor` | Transform Grata exports into validated Reply.io-ready contact lists |
 | `create-skills` | Create new Claude Code skills with proper structure and context engineering |
 | `create-hooks` | Create new hooks (event-driven automations) for validation, routing, and guardrails |
 
@@ -114,15 +121,33 @@ Each team member should:
 2. Have their own Claude Code subscription (Pro or Team)
 3. Add any personal API keys to their OS keychain (never commit secrets)
 
+## MCP Integrations
+
+External tools are connected via MCP (Model Context Protocol) servers. Run `./scripts/setup-mcps.sh` to configure.
+
+| Tool | MCP Status | Notes |
+|------|-----------|-------|
+| ZeroBounce | Ready — `@zerobounce/mcp` (npm) | Email validation. Official MCP. |
+| Clearout | Custom needed | Email validation. REST API available, no standalone MCP. |
+| Reply.io | Custom needed | Official MCP is search-only (limited). Need custom for uploads. |
+| OneDrive | Manual setup | Community MCPs available. Requires Azure app registration. |
+| HubSpot | Optional | Grata syncs directly. Add if needed for other workflows. |
+| Apollo | Available — community | Contact enrichment. Multiple GitHub implementations. |
+| ProxyCurl | Available — community | LinkedIn enrichment. Node.js-based MCP. |
+| Grata | N/A | No API. Input is always a file export. |
+
 ## Project Structure
 
 ```
 wavelength-claude-plugin/
 ├── CLAUDE.md                    # Project-level instructions for Claude
 ├── README.md                    # This file
+├── scripts/
+│   └── setup-mcps.sh           # MCP server configuration script
 ├── .claude/
 │   ├── settings.json            # Hook registrations and permissions
 │   ├── skills/                  # Modular capabilities
+│   │   ├── company-processor/   # Grata export → Reply.io workflow
 │   │   ├── create-skills/       # Skill for creating new skills
 │   │   └── create-hooks/        # Skill for creating new hooks
 │   └── hooks/
