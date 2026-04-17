@@ -27,7 +27,7 @@ intent_patterns:
 </auto_trigger>
 
 <objective>
-Transform a raw Grata export (.xlsx/.csv) into a validated, enriched contact list ready for Reply.io upload. Merges company data with executive contacts, filters to owner-operators only, validates emails, generates messaging variables, previews for approval, then saves to OneDrive and uploads to Reply.io.
+Transform a raw Grata export (.xlsx/.csv) into a validated, enriched contact list ready for Reply.io upload. Replaces the manual intermediate worksheets between raw Grata export and Reply.io upload — all transformation happens programmatically. Merges company data with executive contacts, filters to owner-operators only, validates emails, generates messaging variables, previews for approval, then saves to OneDrive and uploads to Reply.io. Does NOT handle HubSpot — Grata syncs to HubSpot separately.
 </objective>
 
 <quick_start>
@@ -44,6 +44,8 @@ Transform a raw Grata export (.xlsx/.csv) into a validated, enriched contact lis
 - **LinkedIn mandatory.** Every contact must have a LinkedIn URL. If missing, use fallback: `https://www.linkedin.com/in/denis-beslic-30bb6b25/`
 - **Validate before send.** Never upload to Reply.io without showing preview and getting explicit user approval.
 - **Case rules.** Industry and business model are all lowercase, except acronyms (e.g., "OSHA compliance software"). Industry is broad ("fire safety"), business model is narrow and specific to the company.
+- **No HubSpot.** Grata syncs directly to HubSpot via its own integration. This skill handles Reply.io only.
+- **Deduplicate.** After merging both tabs, deduplicate by email. If same person appears in both, keep the entry with the more senior title.
 </essential_principles>
 
 <process>
@@ -62,7 +64,7 @@ Transform a raw Grata export (.xlsx/.csv) into a validated, enriched contact lis
 
 3. **Generate messaging variables** [MEDIUM freedom]
    For each contact:
-   - `industry` — use the target industry from intake (broad, lowercase, sentence-friendly)
+   - `industry` — use the target industry from intake. This is a batch-level constant — every contact gets the same value. Must be broad, lowercase, and fit "I was researching the {industry} sector"
    - `business_model` — read company description, generate a narrow ~5-word descriptor (lowercase except acronyms). Must sound specific enough for "I'm interested in acquiring a company in the {business_model} space"
    - `year_founded` — from Companies tab (NOT tenure)
    - Populate LinkedIn from export; if missing, use fallback URL
@@ -75,8 +77,10 @@ Transform a raw Grata export (.xlsx/.csv) into a validated, enriched contact lis
    **If API access is not yet configured:** Skip validation, warn the user that emails are unvalidated, and note which services are needed.
 
 5. **Build output CSV** [LOW freedom]
-   Assemble final CSV matching the Reply.io upload template. See `references/field-mappings.md` for exact column order and formatting.
-   Columns: email, first_name, last_name, company_name, title, industry, business_model, year_founded, city, state, linkedin_profile, clearout_rating, zerobounce_rating
+   Produce TWO files. See `references/field-mappings.md` for column specs.
+   - **Master CSV** (all columns): email, first_name, last_name, company_name, title, industry, business_model, year_founded, city, state, linkedin_profile, clearout_rating, zerobounce_rating
+   - **Reply.io upload CSV** (green + yellow only): email, first_name, last_name, company_name, title, industry, business_model, year_founded, city, state, linkedin_profile
+   Red columns (clearout_rating, zerobounce_rating) are excluded from the Reply.io file.
 
 6. **Preview and approve** [LOW freedom]
    Show the user a formatted table of the first 5 rows.

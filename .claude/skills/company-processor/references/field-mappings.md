@@ -22,7 +22,7 @@ Final CSV columns in order. Color coding from Dino's template:
 | 3 | last_name | Green | Executive tab | Title case | {{last_name}} |
 | 4 | company_name | Green | Companies tab | As-is | {{company_name}} |
 | 5 | title | — | Executive tab | As-is | — |
-| 6 | industry | Green | User input (intake question) | All lowercase, no abbreviations unless standard | {{industry}} |
+| 6 | industry | Green | User input (intake question). **Batch constant** — same value for every row. | All lowercase. Must fit "I was researching the {industry} sector" | {{industry}} |
 | 7 | business_model | Green | AI-generated from company description | All lowercase except acronyms. ~5 words. Specific enough for "acquiring a company in the {business_model} space" | {{business_model}} |
 | 8 | year_founded | Green | Companies tab | 4-digit year | {{year_founded}} |
 | 9 | city | Green | Companies tab → headquarters | Extracted from location string, title case | {{city}} |
@@ -84,3 +84,13 @@ Parsing rules:
 - If state is full name, keep as-is (match Dino's current format)
 - Always use company headquarters location, never the executive's personal location
 </location_parsing>
+
+<reply_io_structure>
+Reply.io organizes outreach as:
+
+- **Sequence** = a pre-built outreach template with ~10 touches (mix of email and LinkedIn steps). Wavelength reuses sequences across campaigns — they are not recreated each time.
+- **Campaign** = a sequence applied to a list of contacts. To launch a new campaign, upload a new contact list to an existing sequence.
+- **Contact upload** = importing a CSV of contacts into a campaign. The CSV must include all green variables (used in message personalization) and the LinkedIn URL (yellow — required for LinkedIn sequence steps; sequence stops if missing).
+
+The skill's job is to prepare the contact CSV and upload it to the user's chosen sequence. The user selects which sequence at intake. If Reply.io API is unavailable, provide the CSV for manual import via Reply.io > People > Import.
+</reply_io_structure>
