@@ -62,34 +62,28 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
    - **Unrecognizable** → stop, ask user to confirm column mapping.
 
 2. **Intake and load learnings** [LOW freedom]
-   Ask the user:
-   - Target industry for this search (e.g., "fire safety", "cybersecurity")
-   - Path to industry-specific thesis docs (if available — otherwise use general criteria)
-   - Any additional exclusions (e.g., "skip construction", "exclude companies under $3M")
+   Ask the user (use AskUserQuestion, keep it simple):
+   - Target industry (e.g., "fire safety", "cybersecurity")
+   - Any extra exclusions — offer "None" as default. Do NOT pre-generate exclusion options by peeking at data. Just offer a free-text option alongside "None."
 
-   Then load prior learnings:
+   Load prior learnings silently:
    - Read `references/scoring-criteria.md` — especially the `## Learned Adjustments` section
-   - If adjustments exist for this industry, state them upfront: "From previous runs, I know: {adjustments}. Still applying these?"
-   - If no prior learnings exist, note: "No prior calibration for {industry}. Will calibrate on first batch."
+   - If adjustments exist for this industry, state them in one line: "Applying prior calibration: {adjustments}."
+   - If no prior learnings → say nothing, will calibrate on first batch.
 
-3. **Confirm plan** [LOW freedom]
-   After discovery + intake, show a short execution plan. Format:
+3. **Show plan and proceed** [LOW freedom]
+   Show a short execution plan table, then **immediately start extraction.** Do NOT ask "Ready to proceed?" or wait for confirmation. The plan is informational — the user can interrupt if they want to adjust.
 
    ```
-   ## Execution Plan
    | Step | What | Est. |
    |------|------|------|
-   | Extract | {n} companies from Companies tab | ~30s |
-   | Calibrate | Score first 10, ask you 3-5 questions | ~3 min |
-   | Score | Remaining {n-10} in {x} batches of 40 | ~15 min |
-   | Rank | Force-rank HIGH and MEDIUM tiers | ~2 min |
-   | Output | Generate xlsx + csv files | ~30s |
-
-   **Criteria loaded:** {list active criteria + any learned adjustments}
-   **Exclusions:** {user-specified exclusions}
+   | Extract | {n} companies + owner signals | ~30s |
+   | Calibrate | Score first 10, ask 3-5 questions | ~3 min |
+   | Score | Remaining {n-10} in batches of 40 | ~10 min |
+   | Rank + Output | Force-rank, generate xlsx + csv | ~2 min |
    ```
 
-   Wait for user to confirm or adjust (e.g., "skip the exec tab scan", "use batches of 20", "add exclusion: no companies under $5M").
+   Then immediately proceed to step 4. No gate.
 
 4. **Extract company data** [MEDIUM freedom]
    Read the Companies tab into structured JSON (use Python or Read tool with offset/limit for large files).
