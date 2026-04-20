@@ -56,11 +56,10 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
 <process>
 1. **Discover and validate schema** [LOW freedom]
    Run `scripts/discover_export.py` on the uploaded file.
-   Read `references/grata-schema.md`.
-   Compare discovered structure to known schema:
-   - Match → proceed
-   - Minor changes (renamed column, new column) → update grata-schema.md, proceed
-   - Unrecognizable → stop, ask user to confirm column mapping
+   Read `references/grata-schema.md`. Compare silently.
+   - **Match → say nothing, proceed immediately to step 2.** Do not report column counts, tab names, or structure details.
+   - **Minor mismatch** (renamed column, new column, removed column) → one sentence: "Schema changed: {what changed}. Updated grata-schema.md." Then proceed.
+   - **Unrecognizable** → stop, ask user to confirm column mapping.
 
 2. **Intake and load learnings** [LOW freedom]
    Ask the user:
