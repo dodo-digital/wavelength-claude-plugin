@@ -52,7 +52,8 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
 - **Batch processing.** Process 30-50 companies per scoring pass. Accumulate results. Do not attempt all 400+ in a single prompt.
 - **Descriptors are specific.** Must fit "They do {descriptor}" and distinguish from peers. See anti-patterns in scoring-criteria.md.
 - **Always generate files.** The job is not done until xlsx + csv output files exist on disk. Chat display is preview only.
-- **Tables for everything.** All previews, calibration batches, and summaries must use markdown tables. Fixed columns, aligned, scannable. Never dump free-text lists.
+- **Tables for everything. No exceptions.** All previews, calibration batches, and summaries MUST be markdown tables. NEVER output numbered free-text lists, card-style blocks, or separator lines between entries. If showing companies, it is a table. Period. Example: `| # | Company | Revenue | Founded | Descriptor | Fit | Key Signal |`
+- **Plain English questions.** The user is a non-technical search fund operator. Never use jargon (TLD, NAICS, domain extension). Say what you mean simply: "Two companies list US addresses but their websites are .ae (UAE) and .ma (Morocco) — should I treat them as US companies or not?" Frame every question so the answer is obvious from the phrasing.
 </essential_principles>
 
 <process>
@@ -96,20 +97,24 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
    Save extracted JSON to a temp file for batch processing.
 
 5. **Calibration batch** [LOW freedom]
-   Score the FIRST 10 companies only. Show results in a table:
+   Score the FIRST 10 companies only. Output MUST be a single markdown table — never a numbered list, never card blocks:
 
    | # | Company | Revenue | Founded | Descriptor | Fit | Key Signal |
    |---|---------|---------|---------|------------|-----|------------|
    | 1 | Acme Fire | $12M | 1998 | fire inspection and compliance | HIGH | founder age 62 |
+   | 2 | ... | ... | ... | ... | ... | ... |
 
-   Then ask targeted calibration questions based on what you observed:
-   - Edge cases: "Company X is an MSP with a dedicated SOC — is that MEDIUM or LOW for you?"
-   - Threshold questions: "Founder is 45 — is that too young for retirement signal, or still relevant?"
-   - Sector boundaries: "Company Y does {adjacent thing} — in or out of scope?"
-   - Descriptor style: "Here are my descriptors for the first 10 — are these the right level of specificity?"
-   - Any patterns in the data: "6 of 10 are MSP/resellers. Should I auto-LOW all MSPs, or case-by-case?"
+   This is the ONLY acceptable format. Do not deviate.
 
-   Ask 3-5 targeted questions. Do NOT ask generic "does this look right?" — ask about the specific judgment calls you had to make.
+   Then use AskUserQuestion with 3-5 targeted calibration questions. Rules for questions:
+   - **Plain English.** No jargon. No acronyms the user wouldn't use. Say "website is .ae which is UAE" not "domain TLD."
+   - **Concrete.** Name the specific company and the specific issue. "Bellwether's founder is 66 — that's a strong retirement signal. But Systems Engineering's CEO is 45. Where's your cutoff for 'near retirement'?"
+   - **Decision-oriented.** Frame so the user can answer in one sentence. Not "what do you think about X?" but "Should X count as Y or Z?"
+   - Edge cases actually encountered in the first 10
+   - Patterns: "7 of 10 are general IT companies that added cybersecurity. Want me to score those differently from pure cyber firms?"
+   - Thresholds: "Where's the age cutoff for retirement signal — 50? 55? 60?"
+
+   Do NOT ask generic "does this look right?" — ask about specific judgment calls.
 
    After answers:
    - Adjust scoring approach for remaining batches

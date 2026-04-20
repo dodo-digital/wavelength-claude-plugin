@@ -103,8 +103,7 @@ Calibration insights from previous runs. Load these BEFORE scoring. Apply consis
 
 Format: `- [{industry}] {adjustment} (learned {date})`
 
-<!-- Adjustments are appended here by the calibration step (process step 4). -->
-<!-- Example: -->
-<!-- - [cybersecurity] MSP with dedicated SOC and own analysts = MEDIUM, pure reseller = LOW (learned 2026-04-20) -->
-<!-- - [cybersecurity] Owner age under 50 with no succession signals = downgrade by one tier (learned 2026-04-20) -->
-<!-- - [fire safety] Fire damage restoration is OUT of scope, fire suppression maintenance is IN (learned 2026-04-21) -->
+- [cybersecurity/SOC] Trust listed HQ address over domain TLD — .ae or .ma with US HQ = score normally (learned 2026-04-20)
+- [cybersecurity/SOC] MSP with SOC = case by case. If cyber/SOC is primary revenue driver = HIGH eligible. If SOC is bolt-on to broad IT = MEDIUM max (learned 2026-04-20)
+- [cybersecurity/SOC] Exec age is secondary signal — weight company founding year (15+ years = strong) over individual age (learned 2026-04-20)
+- [cybersecurity/SOC] CEO tenure under 5 years = downgrade one tier. May indicate recent acquisition or instability (learned 2026-04-20)
