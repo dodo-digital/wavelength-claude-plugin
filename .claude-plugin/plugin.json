@@ -1,0 +1,28 @@
+{
+  "name": "wavelength-equity",
+  "version": "1.0.0",
+  "description": "Deal sourcing and analysis workflows for Wavelength Equity. Automates Grata export enrichment, company scoring, contact processing, and outreach preparation for search fund acquisitions.",
+  "author": {
+    "name": "Dodo Digital",
+    "url": "https://dododigital.ai"
+  },
+  "repository": "https://github.com/dodo-digital/wavelength-claude-plugin",
+  "keywords": [
+    "search-fund",
+    "deal-sourcing",
+    "grata",
+    "company-scoring",
+    "outreach",
+    "investment-thesis"
+  ],
+  "license": "UNLICENSED",
+  "engines": {
+    "claude-code": ">=1.0.0"
+  },
+  "dependencies": {
+    "python": ">=3.9"
+  },
+  "pip": [
+    "openpyxl>=3.1.0"
+  ]
+}
