@@ -40,6 +40,7 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
 </quick_start>
 
 <essential_principles>
+- **Human-in-the-loop.** Never disappear for a long grind. Confirm key points before acting. Show a short plan. Let the user adjust. Surface checkpoints, not just final output.
 - **Self-healing schema.** Never hardcode column positions. Discover structure each run, compare to `references/grata-schema.md`, adapt and update if changed.
 - **Thesis-first.** Load `references/scoring-criteria.md` before scoring. Every rating must reference specific thesis criteria.
 - **Calibrate before grinding.** Always score 10 companies first, ask targeted questions, record learnings, THEN process the rest. Never skip calibration.
@@ -49,6 +50,7 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
 - **Descriptors are specific.** Must fit "They do {descriptor}" and distinguish from peers. See anti-patterns in scoring-criteria.md.
 - **Update the living schema.** If grata-schema.md needs changes after discovery, update it before proceeding.
 - **Always generate files.** The job is not done until xlsx + csv output files exist on disk. Chat display is preview only.
+- **Tables for everything.** All previews, calibration batches, and summaries must use markdown tables. Fixed columns, aligned, scannable. Never dump free-text lists.
 </essential_principles>
 
 <process>
@@ -71,7 +73,26 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
    - If adjustments exist for this industry, state them upfront: "From previous runs, I know: {adjustments}. Still applying these?"
    - If no prior learnings exist, note: "No prior calibration for {industry}. Will calibrate on first batch."
 
-3. **Extract company data** [MEDIUM freedom]
+3. **Confirm plan** [LOW freedom]
+   After discovery + intake, show a short execution plan. Format:
+
+   ```
+   ## Execution Plan
+   | Step | What | Est. |
+   |------|------|------|
+   | Extract | {n} companies from Companies tab | ~30s |
+   | Calibrate | Score first 10, ask you 3-5 questions | ~3 min |
+   | Score | Remaining {n-10} in {x} batches of 40 | ~15 min |
+   | Rank | Force-rank HIGH and MEDIUM tiers | ~2 min |
+   | Output | Generate xlsx + csv files | ~30s |
+
+   **Criteria loaded:** {list active criteria + any learned adjustments}
+   **Exclusions:** {user-specified exclusions}
+   ```
+
+   Wait for user to confirm or adjust (e.g., "skip the exec tab scan", "use batches of 20", "add exclusion: no companies under $5M").
+
+4. **Extract company data** [MEDIUM freedom]
    Read the Companies tab into structured JSON (use Python or Read tool with offset/limit for large files).
    Scan executive tabs for owner-operator signals:
    - Founder/Owner in title → strong signal
@@ -79,8 +100,13 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
    - No institutional titles (VP of BD, Chief Strategy Officer) → moderate signal
    Save extracted JSON to a temp file for batch processing.
 
-4. **Calibration batch** [LOW freedom]
-   Score the FIRST 10 companies only. Show results in a table (company, descriptor, rating, rationale).
+5. **Calibration batch** [LOW freedom]
+   Score the FIRST 10 companies only. Show results in a table:
+
+   | # | Company | Revenue | Founded | Descriptor | Fit | Key Signal |
+   |---|---------|---------|---------|------------|-----|------------|
+   | 1 | Acme Fire | $12M | 1998 | fire inspection and compliance | HIGH | founder age 62 |
+
    Then ask targeted calibration questions based on what you observed:
    - Edge cases: "Company X is an MSP with a dedicated SOC — is that MEDIUM or LOW for you?"
    - Threshold questions: "Founder is 45 — is that too young for retirement signal, or still relevant?"
@@ -95,7 +121,7 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
    - Record adjustments in `references/scoring-criteria.md` under `## Learned Adjustments`
    - Format: `- [{industry}] {adjustment} (learned {date})`
 
-5. **Score remaining batches** [HIGH freedom]
+6. **Score remaining batches** [HIGH freedom]
    Apply calibrated criteria to remaining companies.
    Process 30-50 per batch:
    - Read batch from extracted JSON
@@ -104,7 +130,7 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
    - Append scored results to accumulation file
    Repeat until all companies processed.
 
-6. **Force-rank** [HIGH freedom]
+7. **Force-rank** [HIGH freedom]
    Second pass on scored results:
    - Load all HIGH-fit companies, rank by: thesis alignment > description clarity > revenue fit > founding year > owner presence
    - Assign H1, H2, H3...
@@ -112,17 +138,33 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
    - Assign M1, M2, M3...
    - LOW-fit companies all get "L" (no individual ranking)
 
-7. **Preview and approve** [LOW freedom]
-   Show the user:
-   - Summary counts (HIGH: n, MEDIUM: n, LOW: n)
-   - Top 20 high-fit companies in a markdown table (rank, name, descriptor, rationale)
-   - Data quality flags (missing descriptions, ambiguous ratings, assumptions made)
-   - Calibration adjustments applied this run
+8. **Preview and approve** [LOW freedom]
+   Show the user a summary table:
+
+   | Tier | Count | Example |
+   |------|-------|---------|
+   | HIGH | 12 | Bellwether Technology (H1) |
+   | MEDIUM | 34 | Pro4ia (M1) |
+   | LOW | 405 | — |
+
+   Then the top 20 HIGH-fit in detail:
+
+   | Rank | Company | Descriptor | Revenue | Founded | Rationale |
+   |------|---------|------------|---------|---------|-----------|
+   | H1 | ... | ... | ... | ... | ... |
+
+   Plus: data quality flags, calibration adjustments applied this run.
    Wait for approval before generating output files.
 
-8. **Generate output** [LOW freedom]
+9. **Generate output** [LOW freedom]
    Pipe complete enrichment JSON to `scripts/format_output.py <industry> <output_dir>`.
-   Report: file locations, total counts, high-fit count.
+   Report file locations in a table:
+
+   | File | Path | Records |
+   |------|------|---------|
+   | Enriched xlsx | ./cybersecurity-2026-04-20-enriched.xlsx | 451 |
+   | Shortlist csv | ./cybersecurity-2026-04-20-shortlist.csv | 12 |
+
    Suggest next step: "Run company-processor on the shortlist to prepare outreach contacts."
 </process>
 
