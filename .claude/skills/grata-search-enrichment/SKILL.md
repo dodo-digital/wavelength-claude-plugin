@@ -40,6 +40,7 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
 </quick_start>
 
 <essential_principles>
+- **Claude scores, Python does I/O.** Python scripts ONLY read xlsx → JSON and write JSON → xlsx/csv. ALL scoring, descriptor generation, fit rating, and rationale writing is done by Claude reading the data and using its judgment. NEVER write a Python script with scoring logic, keyword matching, or business rules. That defeats the entire purpose of this skill.
 - **Run to completion.** This skill does NOT stop until output files exist on disk. Asking a question via AskUserQuestion is a checkpoint within the flow, not an exit. After the user answers, keep going. Never print a question as plain text and wait — that halts execution.
 - **AskUserQuestion or nothing.** Every question to the user MUST use the AskUserQuestion tool. Never ask questions as plain text. If you have nothing worth asking, don't ask — just proceed.
 - **Smart questions only.** Ask when there's a real judgment call: edge cases from the data, conflicting signals, threshold decisions. Do NOT ask when you have no basis for the question or when the answer is already in scoring-criteria.md.
@@ -89,15 +90,21 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
    Then immediately proceed to step 4. No gate.
 
 4. **Extract company data** [MEDIUM freedom]
-   Read the Companies tab into structured JSON (use Python or Read tool with offset/limit for large files).
-   Scan executive tabs for owner-operator signals:
-   - Founder/Owner in title → strong signal
-   - Small exec team (1-3 contacts) → moderate signal
-   - No institutional titles (VP of BD, Chief Strategy Officer) → moderate signal
-   Save extracted JSON to a temp file for batch processing.
+   Use Python ONLY to extract raw data from the xlsx into a JSON file. The script reads cells and writes JSON — nothing else. No scoring logic, no filtering, no keyword matching in Python.
 
-5. **Calibration batch** [LOW freedom]
-   Score the FIRST 10 companies only. Output MUST be a single markdown table — never a numbered list, never card blocks:
+   Extract:
+   - All companies from Companies tab (name, description, revenue, employees, founded, HQ, industry, website, ownership)
+   - Owner-operator signals from exec tabs (titles containing Owner/Founder/President/CEO, exec count per company)
+
+   Save to a temp JSON file. This is the data Claude will read and score.
+
+5. **Calibration batch — Claude reads and scores** [LOW freedom]
+   Read the first 10 companies from the extracted JSON using the Read tool.
+   **YOU (Claude) read each company's description, revenue, founding year, HQ, exec signals.** Then YOU decide the descriptor, fit rating, and rationale using your judgment and scoring-criteria.md.
+
+   **Do NOT write a Python script to score.** Python is for I/O only. The scoring is YOUR job — that's the whole point of using an LLM. You read the description, you understand the business, you make the call.
+
+   Output MUST be a single markdown table — never a numbered list, never card blocks:
 
    | # | Company | Revenue | Founded | Descriptor | Fit | Key Signal |
    |---|---------|---------|---------|------------|-----|------------|
@@ -121,14 +128,16 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
    - Record adjustments in `references/scoring-criteria.md` under `## Learned Adjustments`
    - Format: `- [{industry}] {adjustment} (learned {date})`
 
-6. **Score remaining batches** [HIGH freedom]
-   Apply calibrated criteria to remaining companies.
+6. **Score remaining batches — Claude reads and scores** [HIGH freedom]
+   **YOU (Claude) read and score every remaining company.** Do NOT write Python scoring scripts. Python does not understand business descriptions — you do.
+
    Process 30-50 per batch:
-   - Read batch from extracted JSON
-   - For each company: generate descriptor, rate fit (HIGH/MEDIUM/LOW), write 1-2 sentence rationale
-   - Apply calibration adjustments consistently
-   - Append scored results to accumulation file
+   - Read batch from extracted JSON (use Read tool with offset/limit)
+   - For EACH company: read its description, revenue, founding year, exec signals. Use your judgment + scoring-criteria.md + calibration adjustments to generate descriptor, rate fit, write rationale.
+   - Write scored results to an accumulation JSON file (use Python for file writes only)
    Repeat until all companies processed.
+
+   **Why this matters:** A Python script can only keyword-match. You can read "Provides managed detection and response for mid-market financial services" and understand that's a pure-play MDR firm with a niche vertical — HIGH fit. A script would just see "managed" and "detection" and guess.
 
 7. **Force-rank** [HIGH freedom]
    Second pass on scored results:
