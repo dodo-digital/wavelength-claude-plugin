@@ -96,3 +96,15 @@ Within each tier, rank by (in priority order):
 - `H1, H2, H3...` — High-fit companies, ranked
 - `M1, M2, M3...` — Medium-fit companies, ranked
 - `L` — Low-fit companies (not individually ranked, all get "L")
+
+## Learned Adjustments
+
+Calibration insights from previous runs. Load these BEFORE scoring. Apply consistently unless user overrides.
+
+Format: `- [{industry}] {adjustment} (learned {date})`
+
+<!-- Adjustments are appended here by the calibration step (process step 4). -->
+<!-- Example: -->
+<!-- - [cybersecurity] MSP with dedicated SOC and own analysts = MEDIUM, pure reseller = LOW (learned 2026-04-20) -->
+<!-- - [cybersecurity] Owner age under 50 with no succession signals = downgrade by one tier (learned 2026-04-20) -->
+<!-- - [fire safety] Fire damage restoration is OUT of scope, fire suppression maintenance is IN (learned 2026-04-21) -->

@@ -42,10 +42,13 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
 <essential_principles>
 - **Self-healing schema.** Never hardcode column positions. Discover structure each run, compare to `references/grata-schema.md`, adapt and update if changed.
 - **Thesis-first.** Load `references/scoring-criteria.md` before scoring. Every rating must reference specific thesis criteria.
+- **Calibrate before grinding.** Always score 10 companies first, ask targeted questions, record learnings, THEN process the rest. Never skip calibration.
+- **Learnings persist.** Read `## Learned Adjustments` in scoring-criteria.md at start of every run. State them to the user. Update after calibration.
 - **No fabrication.** If company data is insufficient for confident rating, mark MEDIUM with rationale noting uncertainty. Never invent details.
 - **Batch processing.** Process 30-50 companies per scoring pass. Accumulate results. Do not attempt all 400+ in a single prompt.
 - **Descriptors are specific.** Must fit "They do {descriptor}" and distinguish from peers. See anti-patterns in scoring-criteria.md.
 - **Update the living schema.** If grata-schema.md needs changes after discovery, update it before proceeding.
+- **Always generate files.** The job is not done until xlsx + csv output files exist on disk. Chat display is preview only.
 </essential_principles>
 
 <process>
@@ -57,29 +60,51 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
    - Minor changes (renamed column, new column) → update grata-schema.md, proceed
    - Unrecognizable → stop, ask user to confirm column mapping
 
-2. **Intake** [LOW freedom]
+2. **Intake and load learnings** [LOW freedom]
    Ask the user:
    - Target industry for this search (e.g., "fire safety", "cybersecurity")
    - Path to industry-specific thesis docs (if available — otherwise use general criteria)
    - Any additional exclusions (e.g., "skip construction", "exclude companies under $3M")
 
+   Then load prior learnings:
+   - Read `references/scoring-criteria.md` — especially the `## Learned Adjustments` section
+   - If adjustments exist for this industry, state them upfront: "From previous runs, I know: {adjustments}. Still applying these?"
+   - If no prior learnings exist, note: "No prior calibration for {industry}. Will calibrate on first batch."
+
 3. **Extract company data** [MEDIUM freedom]
    Read the Companies tab into structured JSON (use Python or Read tool with offset/limit for large files).
-   Optionally scan executive tabs for owner-operator signals:
+   Scan executive tabs for owner-operator signals:
    - Founder/Owner in title → strong signal
    - Small exec team (1-3 contacts) → moderate signal
    - No institutional titles (VP of BD, Chief Strategy Officer) → moderate signal
    Save extracted JSON to a temp file for batch processing.
 
-4. **Score and rate in batches** [HIGH freedom]
-   Load `references/scoring-criteria.md`.
-   Process 30-50 companies per batch:
+4. **Calibration batch** [LOW freedom]
+   Score the FIRST 10 companies only. Show results in a table (company, descriptor, rating, rationale).
+   Then ask targeted calibration questions based on what you observed:
+   - Edge cases: "Company X is an MSP with a dedicated SOC — is that MEDIUM or LOW for you?"
+   - Threshold questions: "Founder is 45 — is that too young for retirement signal, or still relevant?"
+   - Sector boundaries: "Company Y does {adjacent thing} — in or out of scope?"
+   - Descriptor style: "Here are my descriptors for the first 10 — are these the right level of specificity?"
+   - Any patterns in the data: "6 of 10 are MSP/resellers. Should I auto-LOW all MSPs, or case-by-case?"
+
+   Ask 3-5 targeted questions. Do NOT ask generic "does this look right?" — ask about the specific judgment calls you had to make.
+
+   After answers:
+   - Adjust scoring approach for remaining batches
+   - Record adjustments in `references/scoring-criteria.md` under `## Learned Adjustments`
+   - Format: `- [{industry}] {adjustment} (learned {date})`
+
+5. **Score remaining batches** [HIGH freedom]
+   Apply calibrated criteria to remaining companies.
+   Process 30-50 per batch:
    - Read batch from extracted JSON
    - For each company: generate descriptor, rate fit (HIGH/MEDIUM/LOW), write 1-2 sentence rationale
+   - Apply calibration adjustments consistently
    - Append scored results to accumulation file
    Repeat until all companies processed.
 
-5. **Force-rank** [HIGH freedom]
+6. **Force-rank** [HIGH freedom]
    Second pass on scored results:
    - Load all HIGH-fit companies, rank by: thesis alignment > description clarity > revenue fit > founding year > owner presence
    - Assign H1, H2, H3...
@@ -87,14 +112,15 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
    - Assign M1, M2, M3...
    - LOW-fit companies all get "L" (no individual ranking)
 
-6. **Preview and approve** [LOW freedom]
+7. **Preview and approve** [LOW freedom]
    Show the user:
    - Summary counts (HIGH: n, MEDIUM: n, LOW: n)
    - Top 20 high-fit companies in a markdown table (rank, name, descriptor, rationale)
    - Data quality flags (missing descriptions, ambiguous ratings, assumptions made)
+   - Calibration adjustments applied this run
    Wait for approval before generating output files.
 
-7. **Generate output** [LOW freedom]
+8. **Generate output** [LOW freedom]
    Pipe complete enrichment JSON to `scripts/format_output.py <industry> <output_dir>`.
    Report: file locations, total counts, high-fit count.
    Suggest next step: "Run company-processor on the shortlist to prepare outreach contacts."
