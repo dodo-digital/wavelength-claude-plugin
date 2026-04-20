@@ -40,15 +40,17 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
 </quick_start>
 
 <essential_principles>
-- **Human-in-the-loop.** Never disappear for a long grind. Confirm key points before acting. Show a short plan. Let the user adjust. Surface checkpoints, not just final output.
+- **Run to completion.** This skill does NOT stop until output files exist on disk. Asking a question via AskUserQuestion is a checkpoint within the flow, not an exit. After the user answers, keep going. Never print a question as plain text and wait — that halts execution.
+- **AskUserQuestion or nothing.** Every question to the user MUST use the AskUserQuestion tool. Never ask questions as plain text. If you have nothing worth asking, don't ask — just proceed.
+- **Smart questions only.** Ask when there's a real judgment call: edge cases from the data, conflicting signals, threshold decisions. Do NOT ask when you have no basis for the question or when the answer is already in scoring-criteria.md.
+- **Exclusions from learnings, not data peeking.** If prior calibration (Learned Adjustments) includes exclusions for this industry, suggest those. If nothing exists yet, just offer "None" and free-text. Never infer exclusion options by reading ahead into the data.
 - **Self-healing schema.** Never hardcode column positions. Discover structure each run, compare to `references/grata-schema.md`, adapt and update if changed.
 - **Thesis-first.** Load `references/scoring-criteria.md` before scoring. Every rating must reference specific thesis criteria.
 - **Calibrate before grinding.** Always score 10 companies first, ask targeted questions, record learnings, THEN process the rest. Never skip calibration.
-- **Learnings persist.** Read `## Learned Adjustments` in scoring-criteria.md at start of every run. State them to the user. Update after calibration.
+- **Learnings persist.** Read `## Learned Adjustments` in scoring-criteria.md at start of every run. Apply them. Update after calibration.
 - **No fabrication.** If company data is insufficient for confident rating, mark MEDIUM with rationale noting uncertainty. Never invent details.
 - **Batch processing.** Process 30-50 companies per scoring pass. Accumulate results. Do not attempt all 400+ in a single prompt.
 - **Descriptors are specific.** Must fit "They do {descriptor}" and distinguish from peers. See anti-patterns in scoring-criteria.md.
-- **Update the living schema.** If grata-schema.md needs changes after discovery, update it before proceeding.
 - **Always generate files.** The job is not done until xlsx + csv output files exist on disk. Chat display is preview only.
 - **Tables for everything.** All previews, calibration batches, and summaries must use markdown tables. Fixed columns, aligned, scannable. Never dump free-text lists.
 </essential_principles>
@@ -62,14 +64,14 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
    - **Unrecognizable** → stop, ask user to confirm column mapping.
 
 2. **Intake and load learnings** [LOW freedom]
-   Ask the user (use AskUserQuestion, keep it simple):
-   - Target industry (e.g., "fire safety", "cybersecurity")
-   - Any extra exclusions — offer "None" as default. Do NOT pre-generate exclusion options by peeking at data. Just offer a free-text option alongside "None."
+   Load `references/scoring-criteria.md` — read `## Learned Adjustments` section first.
 
-   Load prior learnings silently:
-   - Read `references/scoring-criteria.md` — especially the `## Learned Adjustments` section
-   - If adjustments exist for this industry, state them in one line: "Applying prior calibration: {adjustments}."
-   - If no prior learnings → say nothing, will calibrate on first batch.
+   Use AskUserQuestion to ask:
+   - Target industry (e.g., "fire safety", "cybersecurity")
+   - If Learned Adjustments exist for this industry and include exclusions or rules worth confirming, offer those as suggested options (e.g., "Apply prior rule: MSPs without dedicated SOC = LOW"). This is useful — it reminds the user what was learned before.
+   - If NO learned adjustments exist for this industry, just offer "None" + free-text for exclusions. Do not guess.
+
+   After answers, proceed immediately.
 
 3. **Show plan and proceed** [LOW freedom]
    Show a short execution plan table, then **immediately start extraction.** Do NOT ask "Ready to proceed?" or wait for confirmation. The plan is informational — the user can interrupt if they want to adjust.
@@ -131,7 +133,7 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
    - Assign M1, M2, M3...
    - LOW-fit companies all get "L" (no individual ranking)
 
-8. **Preview and approve** [LOW freedom]
+8. **Preview and generate output** [LOW freedom]
    Show the user a summary table:
 
    | Tier | Count | Example |
@@ -147,18 +149,18 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
    | H1 | ... | ... | ... | ... | ... |
 
    Plus: data quality flags, calibration adjustments applied this run.
-   Wait for approval before generating output files.
 
-9. **Generate output** [LOW freedom]
-   Pipe complete enrichment JSON to `scripts/format_output.py <industry> <output_dir>`.
-   Report file locations in a table:
+   Then IMMEDIATELY generate output — pipe complete enrichment JSON to `scripts/format_output.py <industry> <output_dir>`.
+   Report file locations:
 
    | File | Path | Records |
    |------|------|---------|
-   | Enriched xlsx | ./cybersecurity-2026-04-20-enriched.xlsx | 451 |
-   | Shortlist csv | ./cybersecurity-2026-04-20-shortlist.csv | 12 |
+   | Enriched xlsx | ./{industry}-{date}-enriched.xlsx | {n} |
+   | Shortlist csv | ./{industry}-{date}-shortlist.csv | {high_count} |
 
    Suggest next step: "Run company-processor on the shortlist to prepare outreach contacts."
+
+   Do NOT wait for approval between preview and file generation. The files are the deliverable.
 </process>
 
 <not_yet_available>
@@ -173,8 +175,8 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
 - [ ] All companies scored with descriptor + fit rating + rationale
 - [ ] No fabricated data in descriptors or ratings
 - [ ] HIGH-fit companies force-ranked (H1, H2, H3...)
-- [ ] Preview shown and user approved before file generation
-- [ ] Enriched xlsx has conditional formatting (green HIGH, yellow MEDIUM)
-- [ ] Shortlist csv contains only HIGH-fit companies, sorted by rank
-- [ ] Batch processing handled 400+ companies without context overflow
+- [ ] Calibration questions asked via AskUserQuestion (not plain text)
+- [ ] Enriched xlsx generated with conditional formatting (green HIGH, yellow MEDIUM)
+- [ ] Shortlist csv generated with only HIGH-fit companies, sorted by rank
+- [ ] Skill ran to completion — files exist on disk when done
 </success_criteria>
