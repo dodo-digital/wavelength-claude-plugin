@@ -127,13 +127,14 @@ def write_enriched_xlsx(companies, output_path):
 
 
 def write_shortlist_csv(companies, output_path):
-    high_fit = [c for c in companies if c.get("fit_rating") == "HIGH"]
-    high_fit.sort(key=lambda c: c.get("force_rank", "Z99"))
+    """Shortlist includes HIGH + MEDIUM companies — everything worth reviewing."""
+    shortlist = [c for c in companies if c.get("fit_rating") in ("HIGH", "MEDIUM")]
+    shortlist.sort(key=lambda c: c.get("force_rank", "Z99"))
 
     with open(output_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=SHORTLIST_COLS, extrasaction="ignore")
         writer.writeheader()
-        for company in high_fit:
+        for company in shortlist:
             writer.writerow(company)
 
 

@@ -89,55 +89,75 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
 
    Then immediately proceed to step 4. No gate.
 
-4. **Extract company data** [MEDIUM freedom]
-   Use Python ONLY to extract raw data from the xlsx into a JSON file. The script reads cells and writes JSON — nothing else. No scoring logic, no filtering, no keyword matching in Python.
+4. **Extract company data to JSON** [MEDIUM freedom]
+   Use Python ONLY to extract raw data from the xlsx into a JSON file. No scoring, no filtering, no keyword matching. Python reads cells and writes JSON.
 
-   Extract:
-   - All companies from Companies tab (name, description, revenue, employees, founded, HQ, industry, website, ownership)
-   - Owner-operator signals from exec tabs (titles containing Owner/Founder/President/CEO, exec count per company)
+   Extract per company:
+   - name, description, revenue, employees, founded, HQ, industry, website, ownership_type
+   - Owner signals from exec tabs: titles containing Owner/Founder/President/CEO, exec names, exec count
 
-   Save to a temp JSON file. This is the data Claude will read and score.
+   Save to `/tmp/grata_extracted.json` as an array of objects. This is what Claude reads next.
 
 5. **Calibration batch — Claude reads and scores** [LOW freedom]
-   Read the first 10 companies from the extracted JSON using the Read tool.
-   **YOU (Claude) read each company's description, revenue, founding year, HQ, exec signals.** Then YOU decide the descriptor, fit rating, and rationale using your judgment and scoring-criteria.md.
+   Read the first 10 companies from `/tmp/grata_extracted.json` using the Read tool.
 
-   **Do NOT write a Python script to score.** Python is for I/O only. The scoring is YOUR job — that's the whole point of using an LLM. You read the description, you understand the business, you make the call.
+   **HOW SCORING WORKS — this is non-negotiable:**
+   - You (Claude) read each company's raw data: description, revenue, founding year, HQ, exec signals
+   - You think about what this business actually does
+   - You write a descriptor that captures their specific activity
+   - You rate fit (HIGH/MEDIUM/LOW) based on scoring-criteria.md
+   - You write a 1-2 sentence rationale explaining why
+   - You output a JSON array of scored objects
 
-   Output MUST be a single markdown table — never a numbered list, never card blocks:
+   **Do NOT write a Python script to score. Do NOT use keyword matching. Do NOT apply algorithmic rules.** The value is YOUR reading comprehension and judgment. A script cannot understand "Provides managed detection and response for mid-market financial services" — you can.
+
+   After scoring 10, display as a markdown table (ONLY format — no cards, no lists):
 
    | # | Company | Revenue | Founded | Descriptor | Fit | Key Signal |
    |---|---------|---------|---------|------------|-----|------------|
    | 1 | Acme Fire | $12M | 1998 | fire inspection and compliance | HIGH | founder age 62 |
-   | 2 | ... | ... | ... | ... | ... | ... |
 
-   This is the ONLY acceptable format. Do not deviate.
-
-   Then use AskUserQuestion with 3-5 targeted calibration questions. Rules for questions:
-   - **Plain English.** No jargon. No acronyms the user wouldn't use. Say "website is .ae which is UAE" not "domain TLD."
-   - **Concrete.** Name the specific company and the specific issue. "Bellwether's founder is 66 — that's a strong retirement signal. But Systems Engineering's CEO is 45. Where's your cutoff for 'near retirement'?"
-   - **Decision-oriented.** Frame so the user can answer in one sentence. Not "what do you think about X?" but "Should X count as Y or Z?"
-   - Edge cases actually encountered in the first 10
-   - Patterns: "7 of 10 are general IT companies that added cybersecurity. Want me to score those differently from pure cyber firms?"
-   - Thresholds: "Where's the age cutoff for retirement signal — 50? 55? 60?"
-
-   Do NOT ask generic "does this look right?" — ask about specific judgment calls.
+   Then use AskUserQuestion with 3-5 targeted calibration questions:
+   - **Plain English.** Say "website is .ae which is UAE" not "domain TLD."
+   - **Concrete.** Name the company and the issue.
+   - **Decision-oriented.** "Should X count as Y or Z?" not "what do you think?"
+   - Ask about patterns, thresholds, and edge cases actually encountered.
 
    After answers:
    - Adjust scoring approach for remaining batches
    - Record adjustments in `references/scoring-criteria.md` under `## Learned Adjustments`
    - Format: `- [{industry}] {adjustment} (learned {date})`
 
-6. **Score remaining batches — Claude reads and scores** [HIGH freedom]
-   **YOU (Claude) read and score every remaining company.** Do NOT write Python scoring scripts. Python does not understand business descriptions — you do.
+6. **Score remaining batches — Claude reads and scores every row** [HIGH freedom]
 
-   Process 30-50 per batch:
-   - Read batch from extracted JSON (use Read tool with offset/limit)
-   - For EACH company: read its description, revenue, founding year, exec signals. Use your judgment + scoring-criteria.md + calibration adjustments to generate descriptor, rate fit, write rationale.
-   - Write scored results to an accumulation JSON file (use Python for file writes only)
-   Repeat until all companies processed.
+   **Mechanism — follow exactly:**
+   1. Read 20-25 companies at a time from `/tmp/grata_extracted.json` (use Read tool with offset/limit)
+   2. For EACH company in the batch, YOU read its description and data, then output a scored JSON object with: company_name, descriptor, fit_rating, rationale, plus all original fields
+   3. Write the batch's scored results to `/tmp/grata_scored_batch_N.json` (use Python ONLY for the file write — you provide the JSON content, Python writes it)
+   4. Repeat for next batch until all companies are scored
+   5. After all batches: merge all batch files into `/tmp/grata_scored_all.json` (Python merge — no re-scoring)
 
-   **Why this matters:** A Python script can only keyword-match. You can read "Provides managed detection and response for mid-market financial services" and understand that's a pure-play MDR firm with a niche vertical — HIGH fit. A script would just see "managed" and "detection" and guess.
+   **Verification:** After merge, count must equal total extracted. If any company is missing, go back and score it. Every single row gets Claude's eyes on it.
+
+   **Batch size:** 20-25 companies per batch. This keeps each scoring pass focused enough for quality. For 500 companies = ~20-25 batches.
+
+   **What Claude outputs per company:**
+   ```json
+   {
+     "company_name": "Bellwether Technology",
+     "descriptor": "managed cybersecurity and SOC defense services",
+     "fit_rating": "HIGH",
+     "rationale": "Founded 1980, dedicated SOC practice, founder Poco Sloss (age 66) still active. Pure cyber, recurring managed contracts, $14M revenue in sweet spot.",
+     "revenue": "$14M",
+     "employees": "85",
+     "year_founded": "1980",
+     "hq": "New Orleans, LA",
+     "website": "bellwethertech.com",
+     "owner_signals": "Founder/CEO Poco Sloss, age 66, listed since founding"
+   }
+   ```
+
+   **Do NOT write a Python scoring script. Do NOT batch-apply rules algorithmically.** Each company gets individual attention from Claude.
 
 7. **Force-rank** [HIGH freedom]
    Second pass on scored results:

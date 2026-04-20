@@ -35,9 +35,9 @@ Industry slug is lowercase, hyphenated (e.g., "fire-safety", "cybersecurity", "v
 | 3 | MEDIUM fit: {n} |
 | 4 | LOW fit: {n} |
 
-## Shortlist CSV — High-Fit Only
+## Shortlist CSV — HIGH + MEDIUM
 
-For quick review, Grata re-curation, or HubSpot import.
+For quick review, Grata re-curation, or HubSpot import. Includes all companies worth looking at (excludes only LOW).
 
 | # | Column | Description |
 |---|--------|-------------|
