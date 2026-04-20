@@ -1,0 +1,119 @@
+---
+name: grata-search-enrichment
+description: Score and rank Grata search exports against Wavelength's investment thesis. Use when enriching company lists, prioritizing search results, or building shortlists from Grata exports. Generates descriptors, rates fit, force-ranks, and outputs a prioritized shortlist.
+context_budget:
+  skill_md: 150
+---
+
+<auto_trigger>
+keywords:
+  - "grata search"
+  - "search enrichment"
+  - "score companies"
+  - "rank companies"
+  - "company shortlist"
+  - "prioritize list"
+  - "thesis fit"
+  - "grata enrichment"
+
+intent_patterns:
+  - "score.*grata"
+  - "rank.*companies"
+  - "enrich.*export"
+  - "prioritize.*list"
+  - "shortlist.*grata"
+  - "rate.*fit"
+</auto_trigger>
+
+<objective>
+Take a raw Grata search export (400-500 companies), score each company against the investment thesis, generate descriptors, rate fit (HIGH/MEDIUM/LOW), force-rank within tiers, and output a prioritized shortlist. Replaces manual ChatGPT batch processing.
+
+This skill is UPSTREAM of company-processor — it narrows the list. Company-processor then prepares outreach for the selected companies.
+</objective>
+
+<quick_start>
+1. User drops a Grata export xlsx
+2. Skill discovers format, validates against known schema
+3. Asks target industry + any extra exclusions
+4. Scores in batches of 30-50, generates descriptors and ratings
+5. Force-ranks, previews top results, generates output files
+</quick_start>
+
+<essential_principles>
+- **Self-healing schema.** Never hardcode column positions. Discover structure each run, compare to `references/grata-schema.md`, adapt and update if changed.
+- **Thesis-first.** Load `references/scoring-criteria.md` before scoring. Every rating must reference specific thesis criteria.
+- **No fabrication.** If company data is insufficient for confident rating, mark MEDIUM with rationale noting uncertainty. Never invent details.
+- **Batch processing.** Process 30-50 companies per scoring pass. Accumulate results. Do not attempt all 400+ in a single prompt.
+- **Descriptors are specific.** Must fit "They do {descriptor}" and distinguish from peers. See anti-patterns in scoring-criteria.md.
+- **Update the living schema.** If grata-schema.md needs changes after discovery, update it before proceeding.
+</essential_principles>
+
+<process>
+1. **Discover and validate schema** [LOW freedom]
+   Run `scripts/discover_export.py` on the uploaded file.
+   Read `references/grata-schema.md`.
+   Compare discovered structure to known schema:
+   - Match → proceed
+   - Minor changes (renamed column, new column) → update grata-schema.md, proceed
+   - Unrecognizable → stop, ask user to confirm column mapping
+
+2. **Intake** [LOW freedom]
+   Ask the user:
+   - Target industry for this search (e.g., "fire safety", "cybersecurity")
+   - Path to industry-specific thesis docs (if available — otherwise use general criteria)
+   - Any additional exclusions (e.g., "skip construction", "exclude companies under $3M")
+
+3. **Extract company data** [MEDIUM freedom]
+   Read the Companies tab into structured JSON (use Python or Read tool with offset/limit for large files).
+   Optionally scan executive tabs for owner-operator signals:
+   - Founder/Owner in title → strong signal
+   - Small exec team (1-3 contacts) → moderate signal
+   - No institutional titles (VP of BD, Chief Strategy Officer) → moderate signal
+   Save extracted JSON to a temp file for batch processing.
+
+4. **Score and rate in batches** [HIGH freedom]
+   Load `references/scoring-criteria.md`.
+   Process 30-50 companies per batch:
+   - Read batch from extracted JSON
+   - For each company: generate descriptor, rate fit (HIGH/MEDIUM/LOW), write 1-2 sentence rationale
+   - Append scored results to accumulation file
+   Repeat until all companies processed.
+
+5. **Force-rank** [HIGH freedom]
+   Second pass on scored results:
+   - Load all HIGH-fit companies, rank by: thesis alignment > description clarity > revenue fit > founding year > owner presence
+   - Assign H1, H2, H3...
+   - Load all MEDIUM-fit companies, rank similarly
+   - Assign M1, M2, M3...
+   - LOW-fit companies all get "L" (no individual ranking)
+
+6. **Preview and approve** [LOW freedom]
+   Show the user:
+   - Summary counts (HIGH: n, MEDIUM: n, LOW: n)
+   - Top 20 high-fit companies in a markdown table (rank, name, descriptor, rationale)
+   - Data quality flags (missing descriptions, ambiguous ratings, assumptions made)
+   Wait for approval before generating output files.
+
+7. **Generate output** [LOW freedom]
+   Pipe complete enrichment JSON to `scripts/format_output.py <industry> <output_dir>`.
+   Report: file locations, total counts, high-fit count.
+   Suggest next step: "Run company-processor on the shortlist to prepare outreach contacts."
+</process>
+
+<not_yet_available>
+- **Per-industry thesis documents** — Dino has not yet shared these. Using general thesis + sector criteria until received.
+- **OneDrive integration** — output files saved locally until OneDrive API configured.
+- **HubSpot deduplication** — cannot yet cross-reference against existing HubSpot pipeline to exclude already-contacted companies.
+</not_yet_available>
+
+<success_criteria>
+- [ ] Schema discovery runs without hardcoded assumptions
+- [ ] grata-schema.md updated if format changed
+- [ ] All companies scored with descriptor + fit rating + rationale
+- [ ] No fabricated data in descriptors or ratings
+- [ ] HIGH-fit companies force-ranked (H1, H2, H3...)
+- [ ] Preview shown and user approved before file generation
+- [ ] Enriched xlsx has conditional formatting (green HIGH, yellow MEDIUM)
+- [ ] Shortlist csv contains only HIGH-fit companies, sorted by rank
+- [ ] Batch processing handled 400+ companies without context overflow
+</success_criteria>
