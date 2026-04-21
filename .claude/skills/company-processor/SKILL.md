@@ -70,11 +70,15 @@ Transform a raw Grata export (.xlsx/.csv) into a validated, enriched contact lis
    - Populate LinkedIn from export; if missing, use fallback URL
 
 4. **Validate emails** [LOW freedom]
-   <!-- STATUS: NOT YET IMPLEMENTED — need Clearout and ZeroBounce API access -->
-   Run each email through Clearout AND ZeroBounce validation.
+   Extract all emails to a temp file (one per line), then run:
+   ```
+   python3 scripts/validate_emails.py --file /tmp/emails_to_validate.txt
+   ```
+   Read the JSON output. Map each email's `verdict` to `clearout_rating` column.
    Add validation rating columns (red columns — not uploaded to Reply.io but kept in CSV).
    Flag invalid emails in preview.
-   **If API access is not yet configured:** Skip validation, warn the user that emails are unvalidated, and note which services are needed.
+   **If ZeroBounce is also configured:** Run separately, add `zerobounce_rating` column.
+   **If no API keys found:** Skip validation, warn the user that emails are unvalidated.
 
 5. **Build output CSV** [LOW freedom]
    Produce TWO files. See `references/field-mappings.md` for column specs.
@@ -98,8 +102,7 @@ Transform a raw Grata export (.xlsx/.csv) into a validated, enriched contact lis
 <not_yet_available>
 The following components are not yet configured. When you encounter them, tell the user "I do not yet have access to {component}" and ask them to provide it. Once received, update this skill file.
 
-- **Clearout API access** — needed for email validation (step 4)
-- **ZeroBounce API access** — needed for email validation (step 4)
+- **ZeroBounce API access** — needed for dual email validation (step 4). Clearout is configured and working.
 - **Reply.io API access** — needed for direct upload (step 7). Until confirmed, offer manual CSV upload as fallback.
 - **OneDrive API access** — needed for file storage (step 7). Until confirmed, save files locally.
 - **Reply.io upload template** — the exact .csv column structure for Reply.io import. A sample has been reverse-engineered from call notes, but the actual template file should be uploaded to confirm column order.
