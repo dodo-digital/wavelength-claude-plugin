@@ -39,10 +39,13 @@ If you use external integrations (ZeroBounce, Reply.io, etc.), run:
 |-------|---------|---------|
 | `grata-search-enrichment` | Score Grata exports against thesis, generate prioritized shortlist | Drop a Grata xlsx or say "score companies" |
 | `company-processor` | Transform shortlist into Reply.io-ready contact lists | "process companies" or "prepare outreach" |
+| `deal-analysis` | Generate OA investment memos, score deals, explore deals, red-team theses | `/deal-analysis` or drop a CIM/SIM |
 | `create-skills` | Create new Claude Code skills | `/create-skills` |
 | `create-hooks` | Create event-driven hooks | `/create-hooks` |
 
-## Workflow
+## Workflows
+
+### Sourcing → Outreach
 
 ```
 Grata export (400-500 companies)
@@ -54,6 +57,18 @@ Human review (pick top targets)
 [company-processor]  ← enriches contacts, validates emails, formats for Reply.io
     ↓
 Reply.io upload
+```
+
+### Deal Analysis
+
+```
+CIM / SIM / company docs / conversation context
+    ↓
+[deal-analysis]  ← 4 modes:
+    ├── Generate memo  — Full OA memo (8 parallel sub-agents)
+    ├── Explore deal   — Interactive Q&A / sounding board
+    ├── Score deal     — 100-point weighted scorecard
+    └── Red team       — Stress-test from 3 adversarial perspectives
 ```
 
 ## What Grata Search Enrichment Does
@@ -83,16 +98,13 @@ wavelength-claude-plugin/
 ├── .claude/
 │   ├── settings.json            # Permissions and hook config
 │   ├── skills/
-│   │   ├── grata-search-enrichment/
-│   │   │   ├── SKILL.md
-│   │   │   ├── scripts/
-│   │   │   │   ├── discover_export.py
-│   │   │   │   └── format_output.py
-│   │   │   └── references/
-│   │   │       ├── grata-schema.md
-│   │   │       ├── scoring-criteria.md
-│   │   │       └── output-format.md
-│   │   ├── company-processor/
+│   │   ├── grata-search-enrichment/   # Grata export scoring
+│   │   ├── company-processor/         # Contact list prep
+│   │   ├── deal-analysis/             # Investment memo generation
+│   │   │   ├── SKILL.md              # Router (4 modes)
+│   │   │   ├── workflows/            # generate-memo, explore, score, red-team
+│   │   │   ├── references/           # 10 analysis dimensions + scoring
+│   │   │   └── templates/            # OA memo template
 │   │   ├── create-skills/
 │   │   └── create-hooks/
 │   └── hooks/

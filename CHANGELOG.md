@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0] - 2026-04-21
+
+### Added
+- **Deal Analysis skill** — Generate investment memos from CIMs, SIMs, or any deal materials
+  - 4 modes: Generate memo, Explore deal, Score deal, Red team
+  - Full OA memo generation with 8 parallel sub-agents (revenue quality, financial analysis, industry analysis, right-to-win, mission criticality, value creation, risk assessment, missing items)
+  - 100-point weighted scorecard aligned to Wavelength ICP (scale, growth, revenue quality, profitability, other factors)
+  - OA memo format matched to Wavelength's actual template (header metadata table, Deal Killers with mitigants + tests, thesis section)
+  - Interactive explore mode for Q&A and deal sounding board
+  - Red team mode with 3 adversarial personas (Skeptical LP, Operating Partner, Industry Insider)
+  - Accepts CIMs, SIMs, company documents, or conversation context
+
 ## [1.0.0] - 2026-04-20
 
 ### Added
