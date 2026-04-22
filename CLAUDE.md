@@ -19,7 +19,7 @@ Search fund acquiring bootstrapped services businesses. This plugin automates so
 | Reply.io | Outreach sequences — 10 touches per contact (email + LinkedIn) |
 | Apollo | Contact enrichment |
 | ProxyCurl | LinkedIn enrichment — owner age/tenure signals |
-| Clearout + ZeroBounce | Email validation (both required before outreach) |
+| Wavelength MCP | Hosted email validation (Clearout + ZeroBounce). Tools: validate_email, zb_validate_email, bulk_validate, bulk_status, bulk_results, check_credits. API keys server-side, no local keys needed. |
 | OneDrive | File storage — thesis docs, CSV outputs |
 </stack>
 

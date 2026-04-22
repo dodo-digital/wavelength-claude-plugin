@@ -13,33 +13,41 @@ set -euo pipefail
 echo "=== Wavelength Plugin — MCP Setup ==="
 echo ""
 
-# --- ZeroBounce (email validation) ---
-echo "--- ZeroBounce ---"
-echo "Used for email validation before Reply.io upload."
-echo "Get your API key at: https://www.zerobounce.net/members/api"
+# --- Wavelength MCP (email validation) ---
+echo "--- Wavelength MCP ---"
+echo "Hosted email validation server (Clearout + ZeroBounce)."
+echo "API keys are server-side — you only need your personal token."
+echo "Get your token from Dino."
 echo ""
-read -rp "ZeroBounce API key (or press Enter to skip): " ZB_KEY
+read -rp "WL_MCP_TOKEN (or press Enter to skip): " WL_TOKEN
 
-if [[ -n "$ZB_KEY" ]]; then
-  # Check if npm package is installed
-  if ! command -v zerobounce-mcp &>/dev/null; then
-    echo "Installing @zerobounce/mcp..."
-    npm install -g @zerobounce/mcp
+if [[ -n "$WL_TOKEN" ]]; then
+  # Detect shell profile
+  if [[ -f "$HOME/.zshrc" ]]; then
+    PROFILE="$HOME/.zshrc"
+  elif [[ -f "$HOME/.bashrc" ]]; then
+    PROFILE="$HOME/.bashrc"
+  else
+    PROFILE="$HOME/.profile"
   fi
-  claude mcp add zerobounce -- zerobounce-mcp --api-key="$ZB_KEY"
-  echo "✓ ZeroBounce MCP added"
+
+  # Append export if not already present
+  if ! grep -q 'WL_MCP_TOKEN' "$PROFILE" 2>/dev/null; then
+    echo "" >> "$PROFILE"
+    echo "# Wavelength MCP token (email validation)" >> "$PROFILE"
+    echo "export WL_MCP_TOKEN=\"$WL_TOKEN\"" >> "$PROFILE"
+    echo "✓ WL_MCP_TOKEN added to $PROFILE"
+  else
+    echo "⚠ WL_MCP_TOKEN already exists in $PROFILE — not overwriting"
+  fi
+
+  # Export for current session
+  export WL_MCP_TOKEN="$WL_TOKEN"
+  echo "✓ Wavelength MCP configured (token set for this session)"
+  echo "  Restart Claude Code to connect via .mcp.json"
 else
-  echo "⏭ Skipped ZeroBounce"
+  echo "⏭ Skipped Wavelength MCP"
 fi
-
-echo ""
-
-# --- Clearout (email validation) ---
-echo "--- Clearout ---"
-echo "Second email validation source. NOT YET AVAILABLE as a standalone MCP."
-echo "Clearout has a REST API (https://docs.clearout.io/api-overview.html)."
-echo "A custom MCP will be built for this — skipping for now."
-echo "⏭ Skipped Clearout (custom MCP needed)"
 
 echo ""
 
@@ -74,5 +82,4 @@ echo "MCPs configured. Run 'claude mcp list' to verify."
 echo ""
 echo "Still needed (custom MCPs to be built):"
 echo "  - Reply.io (contact upload, campaign management)"
-echo "  - Clearout (email validation)"
 echo "  - OneDrive (file storage — or configure community MCP manually)"

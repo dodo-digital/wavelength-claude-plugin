@@ -25,9 +25,27 @@ cd wavelength-claude-plugin
 claude
 ```
 
-### MCP Setup (optional)
+### Wavelength MCP Setup
 
-If you use external integrations (ZeroBounce, Reply.io, etc.), run:
+The plugin connects to Wavelength's hosted MCP server for email validation (Clearout + ZeroBounce). API keys are server-side — team members only need a personal token from Dino.
+
+**Claude Code users:**
+
+1. Get your token from Dino
+2. Add to your shell profile: `export WL_MCP_TOKEN="your-token"`
+3. Restart Claude Code — tools auto-connect via `.mcp.json`
+4. Test: ask Claude to run `check_credits`
+
+**Claude Cowork users:**
+
+1. Get your personal token from Dino
+2. Go to Customize > Connectors > Add custom connector
+3. Enter URL: `https://wavelength-mcp.vercel.app/mcp/YOUR-TOKEN-HERE`
+4. Click Add — tools appear in Cowork conversations
+
+### Other MCP Setup (optional)
+
+If you use additional integrations (Reply.io, OneDrive, etc.), run:
 
 ```bash
 ./scripts/setup-mcps.sh
