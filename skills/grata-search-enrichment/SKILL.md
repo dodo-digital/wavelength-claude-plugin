@@ -48,7 +48,7 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
 - **Self-healing schema.** Never hardcode column positions. Discover structure each run, compare to `references/grata-schema.md`, adapt and update if changed.
 - **Thesis-first.** Load `references/scoring-criteria.md` before scoring. Every rating must reference specific thesis criteria.
 - **Calibrate before grinding.** Always score 10 companies first, ask targeted questions, record learnings, THEN process the rest. Never skip calibration.
-- **Learnings persist.** Read `## Learned Adjustments` in scoring-criteria.md at start of every run. Apply them. Update after calibration.
+- **Learnings persist via MCP.** At the start of every run, call `get_skill_learnings` with `skill="grata-search-enrichment"` to load shared learnings from the server. Also read `## Learned Adjustments` in scoring-criteria.md for legacy local learnings. After calibration, save new insights via `save_skill_learning` — they propagate to all users automatically.
 - **No fabrication.** If company data is insufficient for confident rating, mark MEDIUM with rationale noting uncertainty. Never invent details.
 - **Batch processing.** Process 30-50 companies per scoring pass. Accumulate results. Do not attempt all 400+ in a single prompt.
 - **Descriptors are specific.** Must fit "They do {descriptor}" and distinguish from peers. See anti-patterns in scoring-criteria.md.
@@ -66,11 +66,12 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
    - **Unrecognizable** → stop, ask user to confirm column mapping.
 
 2. **Intake and load learnings** [LOW freedom]
-   Load `references/scoring-criteria.md` — read `## Learned Adjustments` section first.
+   Load shared learnings from MCP: call `get_skill_learnings` with `skill="grata-search-enrichment"` and the target industry (once known).
+   Also load `references/scoring-criteria.md` for static thesis criteria and legacy local learnings.
 
    Use AskUserQuestion to ask:
    - Target industry (e.g., "fire safety", "cybersecurity")
-   - If Learned Adjustments exist for this industry and include exclusions or rules worth confirming, offer those as suggested options (e.g., "Apply prior rule: MSPs without dedicated SOC = LOW"). This is useful — it reminds the user what was learned before.
+   - If MCP or local learnings exist for this industry and include exclusions or rules worth confirming, offer those as suggested options (e.g., "Apply prior rule: MSPs without dedicated SOC = LOW"). This is useful — it reminds the user what was learned before.
    - If NO learned adjustments exist for this industry, just offer "None" + free-text for exclusions. Do not guess.
 
    After answers, proceed immediately.
@@ -125,8 +126,8 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
 
    After answers:
    - Adjust scoring approach for remaining batches
-   - Record adjustments in `references/scoring-criteria.md` under `## Learned Adjustments`
-   - Format: `- [{industry}] {adjustment} (learned {date})`
+   - Save each calibration insight via MCP: call `save_skill_learning` with `skill="grata-search-enrichment"`, the target industry, category `"adjustment"`, and a single actionable statement per learning
+   - Also record in `references/scoring-criteria.md` under `## Learned Adjustments` as local backup (format: `- [{industry}] {adjustment} (learned {date})`)
 
 6. **Score remaining batches — Claude reads and scores every row** [HIGH freedom]
 

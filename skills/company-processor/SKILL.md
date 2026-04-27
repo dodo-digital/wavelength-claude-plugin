@@ -57,7 +57,7 @@ This skill is DOWNSTREAM of grata-search-enrichment — it takes the selected co
 - **LinkedIn mandatory.** Every contact must have a LinkedIn URL. If missing, use fallback: `https://www.linkedin.com/in/denis-beslic-30bb6b25/`
 - **Validate before send.** Never upload to Reply.io without showing preview and getting explicit user approval.
 - **Self-healing schema.** Never hardcode column positions. Discover structure each run, compare to known schema in `references/processing-rules.md`, adapt and update if changed.
-- **Learnings persist.** Read `## Learned Adjustments` in `references/processing-rules.md` at start of every run. Apply them. Update after each run with anything new.
+- **Learnings persist via MCP.** At the start of every run, call `get_skill_learnings` with `skill="company-processor"` to load shared learnings from the server. After each run, call `save_skill_learning` for any new insights. Learnings are shared automatically across all users — no local file edits needed.
 - **Case rules.** Industry is broad and lowercase ("fire safety"). Business model is narrow, specific, and lowercase except acronyms ("OSHA compliance management software").
 - **Deduplicate.** After merging both exec tabs, deduplicate by email. Same person in both tabs → keep entry with more senior title.
 - **No HubSpot.** Grata syncs directly to HubSpot via its own integration. This skill handles Reply.io only.
@@ -75,13 +75,14 @@ This skill is DOWNSTREAM of grata-search-enrichment — it takes the selected co
    - **Unrecognizable** → stop, ask user to confirm tab/column mapping.
 
 2. **Intake and load learnings** [LOW freedom]
-   Load `references/processing-rules.md` — read `## Learned Adjustments` section first.
+   Load learnings from MCP: call `get_skill_learnings` with `skill="company-processor"` and the target industry (once known).
+   Load `references/processing-rules.md` for static rules (role filter, location parsing, business model rules).
    Load `references/field-mappings.md` for output column specs.
 
    Use AskUserQuestion to ask:
    - Target industry (e.g., "fire safety", "cybersecurity") — this becomes the batch-constant `industry` field
    - Which Reply.io sequence? Query `reply_list_sequences` via MCP, show active sequences, let user pick
-   - If learned adjustments exist for this industry, surface them as options to confirm or skip
+   - If MCP learnings exist for this industry, surface them as options to confirm or skip
 
    After answers, proceed immediately.
 
@@ -169,12 +170,14 @@ This skill is DOWNSTREAM of grata-search-enrichment — it takes the selected co
    **If Reply.io API fails or is not configured:** Save CSVs, instruct user to import via Reply.io > People > Import.
 
 9. **Update learnings** [LOW freedom]
-   After each run, update `references/processing-rules.md` under `## Learned Adjustments`:
-   - Schema changes encountered
-   - Title edge cases (new titles that needed judgment)
-   - Business model patterns that worked well
-   - Data quality issues (e.g., "Company X had no description — used NAICS codes instead")
-   - Format: `- [{industry}] {adjustment} (learned {date})`
+   After each run, save new learnings via MCP using `save_skill_learning` with `skill="company-processor"`:
+   - Schema changes → category: `schema-change`
+   - Title edge cases (new titles that needed judgment) → category: `edge-case`
+   - Business model patterns that worked well → category: `pattern`
+   - Data quality issues → category: `adjustment`
+   - Calibration insights from user feedback → category: `adjustment`
+
+   Each learning should be a single actionable statement. Save one learning per call — don't batch multiple insights into one entry. These are shared across all users automatically.
 </process>
 
 <not_yet_available>
@@ -195,6 +198,6 @@ This skill is DOWNSTREAM of grata-search-enrichment — it takes the selected co
 - [ ] Preview shown and user approved before upload
 - [ ] Master CSV + Reply.io CSV generated on disk
 - [ ] Contacts uploaded to Reply.io (or manual instructions given)
-- [ ] processing-rules.md updated with any new learnings
+- [ ] New learnings saved to MCP via save_skill_learning
 - [ ] Skill ran to completion — files exist on disk when done
 </success_criteria>
