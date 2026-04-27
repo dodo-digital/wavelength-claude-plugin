@@ -11,18 +11,14 @@ A Claude Code plugin for Wavelength Equity's deal sourcing and analysis workflow
 
 ### Install
 
-```bash
-git clone https://github.com/dodo-digital/wavelength-claude-plugin.git
-claude --plugin-dir ./wavelength-claude-plugin
+Open Claude Code and run:
+
+```
+/plugin marketplace add dodo-digital/wavelength-claude-plugin
+/plugin install wavelength-equity@wavelength
 ```
 
-The `--plugin-dir` flag loads the plugin for that session. To update, `git pull` inside the plugin directory.
-
-To always load the plugin, add a shell alias:
-
-```bash
-alias claude-wl='claude --plugin-dir ~/wavelength-claude-plugin'
-```
+The plugin installs permanently and auto-updates when the repo is updated. No further setup needed.
 
 ### Wavelength MCP Setup
 

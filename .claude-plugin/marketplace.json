@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "wavelength",
+  "description": "Deal sourcing and analysis workflows for Wavelength Equity",
+  "owner": {
+    "name": "Dodo Digital",
+    "email": "harrison@dododigital.ai"
+  },
+  "plugins": [
+    {
+      "name": "wavelength-equity",
+      "source": "./",
+      "description": "Grata export enrichment, company scoring, contact processing, and investment memo generation for search fund acquisitions.",
+      "category": "productivity"
+    }
+  ]
+}
