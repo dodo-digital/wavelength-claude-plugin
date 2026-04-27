@@ -12,7 +12,7 @@ A Claude Code plugin for Wavelength Equity's deal sourcing and analysis workflow
 ### Install as Plugin
 
 ```bash
-claude /plugin install github:dodo-digital/wavelength-claude-plugin
+claude plugin install github:dodo-digital/wavelength-claude-plugin
 ```
 
 This installs the plugin and all its skills into your Claude Code environment. Skills update automatically when the plugin updates.
@@ -21,8 +21,7 @@ This installs the plugin and all its skills into your Claude Code environment. S
 
 ```bash
 git clone git@github.com:dodo-digital/wavelength-claude-plugin.git
-cd wavelength-claude-plugin
-claude
+claude --plugin-dir /path/to/wavelength-claude-plugin
 ```
 
 ### Wavelength MCP Setup
@@ -113,21 +112,20 @@ Learned adjustments persist between runs. Each industry gets smarter over time.
 wavelength-claude-plugin/
 ├── .claude-plugin/
 │   └── plugin.json              # Plugin manifest
-├── .claude/
-│   ├── settings.json            # Permissions and hook config
-│   ├── skills/
-│   │   ├── grata-search-enrichment/   # Grata export scoring
-│   │   ├── company-processor/         # Contact list prep
-│   │   ├── deal-analysis/             # Investment memo generation
-│   │   │   ├── SKILL.md              # Router (4 modes)
-│   │   │   ├── workflows/            # generate-memo, explore, score, red-team
-│   │   │   ├── references/           # 10 analysis dimensions + scoring
-│   │   │   └── templates/            # OA memo template
-│   │   ├── create-skills/
-│   │   └── create-hooks/
-│   └── hooks/
-│       └── router/
-├── CLAUDE.md                    # Project instructions
+├── skills/
+│   ├── grata-search-enrichment/   # Grata export scoring
+│   ├── company-processor/         # Contact list prep
+│   ├── deal-analysis/             # Investment memo generation
+│   │   ├── SKILL.md              # Router (4 modes)
+│   │   ├── workflows/            # generate-memo, explore, score, red-team
+│   │   ├── references/           # 10 analysis dimensions + scoring
+│   │   └── templates/            # OA memo template
+│   ├── create-skills/
+│   └── create-hooks/
+├── hooks/
+│   ├── hooks.json                 # Hook manifest (plugin convention)
+│   └── router/                    # Event router framework
+├── CLAUDE.md                      # Project instructions
 ├── CHANGELOG.md
 ├── README.md
 └── scripts/

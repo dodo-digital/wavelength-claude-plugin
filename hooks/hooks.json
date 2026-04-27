@@ -1,0 +1,16 @@
+{
+  "description": "Wavelength skill router — auto-suggests skills based on user prompts",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/router/user_prompt_submit.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

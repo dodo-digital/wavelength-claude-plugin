@@ -16,13 +16,9 @@
     "investment-thesis"
   ],
   "license": "UNLICENSED",
-  "engines": {
-    "claude-code": ">=1.0.0"
-  },
-  "dependencies": {
-    "python": ">=3.9"
-  },
-  "pip": [
-    "openpyxl>=3.1.0"
-  ]
+  "dependencies": [
+    "python3",
+    "openpyxl"
+  ],
+  "mcpServers": ".mcp.json"
 }

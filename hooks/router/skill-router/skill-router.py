@@ -41,7 +41,7 @@ def extract_file_paths(prompt: str) -> list[str]:
         paths.add(match.group(1))
 
     # Match paths starting with common directories
-    dir_pattern = r'(?:^|\s|["\'\`])((?:src|app|lib|components|hooks|utils|services|\.claude)\/[\w\-./]+)'
+    dir_pattern = r'(?:^|\s|["\'\`])((?:src|app|lib|components|hooks|utils|services|skills)\/[\w\-./]+)'
     for match in re.finditer(dir_pattern, prompt, re.IGNORECASE):
         paths.add(match.group(1))
 
@@ -310,7 +310,7 @@ def main():
                     ["python3", str(generate_script)],
                     capture_output=True,
                     timeout=5,
-                    env={**os.environ, "CLAUDE_PROJECT_DIR": os.environ.get("CLAUDE_PROJECT_DIR", os.getcwd())},
+                    env={**os.environ, "CLAUDE_PLUGIN_ROOT": os.environ.get("CLAUDE_PLUGIN_ROOT", os.environ.get("CLAUDE_PROJECT_DIR", os.getcwd()))},
                 )
             except Exception:
                 pass

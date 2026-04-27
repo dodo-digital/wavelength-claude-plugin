@@ -11,7 +11,7 @@ Thumbs.db
 *.key
 
 # Generated files
-.claude/hooks/router/skill-router/skill-rules.json
+hooks/router/skill-router/skill-rules.json
 
 # Python
 __pycache__/

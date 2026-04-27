@@ -15,8 +15,11 @@ def skill_router(input_data: dict) -> Optional[HandlerResult]:
     if not prompt or not prompt.strip():
         return None
 
-    project_dir = os.environ.get("CLAUDE_PROJECT_DIR", os.getcwd())
-    router_dir = Path(project_dir) / ".claude" / "hooks" / "router" / "skill-router"
+    plugin_root = os.environ.get(
+        "CLAUDE_PLUGIN_ROOT",
+        os.environ.get("CLAUDE_PROJECT_DIR", os.getcwd()),
+    )
+    router_dir = Path(plugin_root) / "hooks" / "router" / "skill-router"
     rules_path = router_dir / "skill-rules.json"
     generate_script = router_dir / "generate-rules.py"
     router_script = router_dir / "skill-router.py"
@@ -25,7 +28,7 @@ def skill_router(input_data: dict) -> Optional[HandlerResult]:
         return None
 
     # Auto-regenerate rules if needed
-    skills_dir = Path(project_dir) / ".claude" / "skills"
+    skills_dir = Path(plugin_root) / "skills"
     regenerate = False
 
     if not rules_path.exists():
@@ -46,7 +49,7 @@ def skill_router(input_data: dict) -> Optional[HandlerResult]:
                 ["python3", str(generate_script)],
                 capture_output=True,
                 timeout=5,
-                cwd=project_dir,
+                cwd=plugin_root,
             )
         except Exception:
             pass
@@ -59,7 +62,7 @@ def skill_router(input_data: dict) -> Optional[HandlerResult]:
             capture_output=True,
             text=True,
             timeout=5,
-            cwd=project_dir,
+            cwd=plugin_root,
         )
 
         if result.stdout.strip():

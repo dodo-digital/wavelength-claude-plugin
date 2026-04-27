@@ -29,9 +29,9 @@ Create event-driven hooks that intercept Claude Code actions for validation, con
 
 <quick_start>
 1. Decide which event to hook (UserPromptSubmit, PreToolUse, PostToolUse, SessionStart, Stop)
-2. Create a handler function in `.claude/hooks/router/handlers/`
+2. Create a handler function in `hooks/router/handlers/`
 3. Register the handler in the event's entry point script
-4. Add the event to `.claude/settings.json` if not already registered
+4. Add the event to `hooks/hooks.json` if not already registered
 </quick_start>
 
 <process>
@@ -46,7 +46,7 @@ Create event-driven hooks that intercept Claude Code actions for validation, con
    | `Stop` | Session ends | Cleanup, auto-commit |
 
 2. **Create the handler** [MEDIUM freedom]
-   Create a new file in `.claude/hooks/router/handlers/` or add a function to an existing handler file.
+   Create a new file in `hooks/router/handlers/` or add a function to an existing handler file.
 
    Handler signature:
    ```python
@@ -70,7 +70,7 @@ Create event-driven hooks that intercept Claude Code actions for validation, con
    ```
 
 3. **Register the handler** [LOW freedom]
-   Edit the event's entry point in `.claude/hooks/router/`:
+   Edit the event's entry point in `hooks/router/`:
 
    ```python
    # In {event_name}.py
@@ -87,7 +87,7 @@ Create event-driven hooks that intercept Claude Code actions for validation, con
    ```
 
 4. **Register the event** [LOW freedom]
-   If the event isn't already in `.claude/settings.json`, add it:
+   If the event isn't already in `hooks/hooks.json`, add it:
 
    ```json
    {
@@ -98,7 +98,7 @@ Create event-driven hooks that intercept Claude Code actions for validation, con
            "hooks": [
              {
                "type": "command",
-               "command": "python3 $CLAUDE_PROJECT_DIR/.claude/hooks/router/{event_name}.py",
+               "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/router/{event_name}.py",
                "timeout": 10
              }
            ]
@@ -122,7 +122,7 @@ Create event-driven hooks that intercept Claude Code actions for validation, con
 <success_criteria>
 - [ ] Handler function created with correct signature
 - [ ] Handler registered in event entry point
-- [ ] Event registered in settings.json (if new)
+- [ ] Event registered in hooks/hooks.json (if new)
 - [ ] Handler returns appropriate decision type
 - [ ] Matcher regex filters correctly (if applicable)
 - [ ] Hook tested and fires on expected events

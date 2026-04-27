@@ -3,7 +3,7 @@ from __future__ import annotations
 """
 Generate skill-rules.json from SKILL.md files.
 
-Scans .claude/skills/*/SKILL.md and extracts:
+Scans skills/*/SKILL.md and extracts:
 1. Frontmatter: name, description
 2. <auto_trigger> blocks: explicit trigger patterns
 3. Falls back to keyword extraction from description
@@ -175,7 +175,7 @@ def parse_skill_file(skill_path: Path) -> dict | None:
 
 def generate_rules(project_dir: str) -> dict:
     """Generate complete skill-rules.json from project skills."""
-    skills_dir = Path(project_dir) / ".claude" / "skills"
+    skills_dir = Path(project_dir) / "skills"
 
     rules = {
         "version": "2.0",
@@ -207,7 +207,7 @@ def generate_rules(project_dir: str) -> dict:
 
         if skill_config:
             rules["skills"][skill_name] = skill_config
-            skill_rel_path = f".claude/skills/{skill_name}"
+            skill_rel_path = f"skills/{skill_name}"
             rules["directoryMappings"][skill_rel_path] = skill_name
 
     return rules
@@ -215,7 +215,10 @@ def generate_rules(project_dir: str) -> dict:
 
 def main():
     """Generate skill-rules.json and write to disk."""
-    project_dir = os.environ.get("CLAUDE_PROJECT_DIR", os.getcwd())
+    project_dir = os.environ.get(
+        "CLAUDE_PLUGIN_ROOT",
+        os.environ.get("CLAUDE_PROJECT_DIR", os.getcwd()),
+    )
 
     rules = generate_rules(project_dir)
 
