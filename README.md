@@ -9,19 +9,19 @@ A Claude Code plugin for Wavelength Equity's deal sourcing and analysis workflow
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installed and authenticated
 - Python 3.9+ with `openpyxl` (`pip3 install openpyxl`)
 
-### Install as Plugin
+### Install
 
 ```bash
-claude plugin install github:dodo-digital/wavelength-claude-plugin
+git clone https://github.com/dodo-digital/wavelength-claude-plugin.git
+claude --plugin-dir ./wavelength-claude-plugin
 ```
 
-This installs the plugin and all its skills into your Claude Code environment. Skills update automatically when the plugin updates.
+The `--plugin-dir` flag loads the plugin for that session. To update, `git pull` inside the plugin directory.
 
-### Manual Install (alternative)
+To always load the plugin, add a shell alias:
 
 ```bash
-git clone git@github.com:dodo-digital/wavelength-claude-plugin.git
-claude --plugin-dir /path/to/wavelength-claude-plugin
+alias claude-wl='claude --plugin-dir ~/wavelength-claude-plugin'
 ```
 
 ### Wavelength MCP Setup
