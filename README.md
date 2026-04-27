@@ -35,7 +35,7 @@ The plugin connects to Wavelength's hosted MCP server for email validation (Clea
 
 1. Get your personal token from Dino
 2. Go to Customize > Connectors > Add custom connector
-3. Enter URL: `https://wavelength-mcp.vercel.app/mcp/YOUR-TOKEN-HERE`
+3. Enter URL: `https://wavelength-mcp.vercel.app/api/mcp?token=YOUR-TOKEN-HERE`
 4. Click Add — tools appear in Cowork conversations
 
 ### Other MCP Setup (optional)
