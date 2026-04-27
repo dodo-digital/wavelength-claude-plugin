@@ -1,7 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "wavelength",
-  "description": "Deal sourcing and analysis workflows for Wavelength Equity",
+  "metadata": {
+    "description": "Deal sourcing and analysis workflows for Wavelength Equity"
+  },
   "owner": {
     "name": "Dodo Digital",
     "email": "harrison@dododigital.ai"

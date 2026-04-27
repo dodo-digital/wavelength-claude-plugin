@@ -1,6 +1,6 @@
 {
   "name": "wavelength-equity",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Deal sourcing and analysis workflows for Wavelength Equity. Automates Grata export enrichment, company scoring, contact processing, and outreach preparation for search fund acquisitions.",
   "author": {
     "name": "Dodo Digital",
@@ -15,10 +15,5 @@
     "outreach",
     "investment-thesis"
   ],
-  "license": "UNLICENSED",
-  "dependencies": [
-    "python3",
-    "openpyxl"
-  ],
-  "mcpServers": ".mcp.json"
+  "license": "UNLICENSED"
 }
