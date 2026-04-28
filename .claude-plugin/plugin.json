@@ -1,6 +1,6 @@
 {
   "name": "wavelength-equity",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Deal sourcing and analysis workflows for Wavelength Equity. Automates Grata export enrichment, company scoring, contact processing, and outreach preparation for search fund acquisitions.",
   "author": {
     "name": "Dodo Digital",
@@ -16,5 +16,10 @@
     "investment-thesis"
   ],
   "license": "UNLICENSED",
-  "mcpServers": "./.mcp.json"
+  "mcpServers": {
+    "wavelength": {
+      "type": "http",
+      "url": "https://wavelength-mcp.vercel.app/api/mcp"
+    }
+  }
 }

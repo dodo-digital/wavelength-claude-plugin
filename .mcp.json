@@ -1,8 +1,6 @@
 {
-  "mcpServers": {
-    "wavelength": {
-      "type": "http",
-      "url": "https://wavelength-mcp.vercel.app/api/mcp"
-    }
+  "wavelength": {
+    "type": "http",
+    "url": "https://wavelength-mcp.vercel.app/api/mcp"
   }
 }
