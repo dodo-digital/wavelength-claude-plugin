@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.4.1] - 2026-05-04
+
+### Added
+- **Auto dependency detection** — SessionStart hook checks for Python 3.9+ and openpyxl on every session. If missing, Claude offers to install them automatically. No manual setup needed.
+- **Brain skill** (`/brain`) — Persistent knowledge base that compiles deal research, CIM analyses, and sourcing insights into a structured wiki with linked articles and cross-referenced concepts
+- **Red Team skill** (`/red-team`) — Extracted from deal-analysis into standalone skill. Stress-test deals from 3 adversarial perspectives (Skeptical LP, Operating Partner, Industry Insider)
+- **SessionStart brain injection** — Wiki index and brain context auto-loaded into every session
+- **MCP server bundled** — Plugin declares Wavelength MCP inline in plugin.json, auto-connects on install
+
+### Changed
+- Deal Analysis skill now routes red-team requests to `/red-team`
+- Removed missing-items agent from deal-analysis memo generation (consolidated into red-team)
+
+### Fixed
+- MCP server declaration in plugin.json (inline mcpServers matching Compound Engineering pattern)
+- Plugin.json cleaned of invalid fields that blocked installation
+- MCP URL path standardized to `/api/mcp`
+
 ## [1.1.0] - 2026-04-21
 
 ### Added
