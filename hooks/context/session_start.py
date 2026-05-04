@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""SessionStart hook: initialize brain and inject wiki index into new sessions."""
+"""SessionStart hook: initialize brain, check dependencies, inject context."""
 import os
 import json
 import glob
+import shutil
+import subprocess
 from datetime import date
 
 BRAIN_TEMPLATE = """# Wavelength Brain
@@ -65,6 +67,61 @@ def read_brain_index(brain_dir):
     return None
 
 
+def check_dependencies():
+    """Check required dependencies and return list of missing items with install commands."""
+    missing = []
+
+    # Check Python 3.9+
+    python_path = shutil.which("python3")
+    if not python_path:
+        missing.append({
+            "name": "Python 3.9+",
+            "status": "NOT FOUND",
+            "install": "brew install python3 (macOS) or https://python.org/downloads/",
+            "required_by": "Grata scoring, company processing",
+        })
+    else:
+        try:
+            result = subprocess.run(
+                ["python3", "-c", "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"],
+                capture_output=True, text=True, timeout=5,
+            )
+            version = result.stdout.strip()
+            major, minor = version.split(".")
+            if int(major) < 3 or (int(major) == 3 and int(minor) < 9):
+                missing.append({
+                    "name": f"Python 3.9+ (found {version})",
+                    "status": "VERSION TOO OLD",
+                    "install": "brew upgrade python3 (macOS) or https://python.org/downloads/",
+                    "required_by": "Grata scoring, company processing",
+                })
+        except Exception:
+            pass
+
+    # Check openpyxl
+    try:
+        result = subprocess.run(
+            ["python3", "-c", "import openpyxl; print(openpyxl.__version__)"],
+            capture_output=True, text=True, timeout=5,
+        )
+        if result.returncode != 0:
+            missing.append({
+                "name": "openpyxl (Python package)",
+                "status": "NOT INSTALLED",
+                "install": "pip3 install openpyxl",
+                "required_by": "Grata scoring (xlsx file processing)",
+            })
+    except Exception:
+        missing.append({
+            "name": "openpyxl (Python package)",
+            "status": "CHECK FAILED",
+            "install": "pip3 install openpyxl",
+            "required_by": "Grata scoring (xlsx file processing)",
+        })
+
+    return missing
+
+
 def main():
     plugin_root = os.environ.get("CLAUDE_PLUGIN_ROOT", "")
     brain_dir = resolve_brain_dir()
@@ -72,9 +129,11 @@ def main():
     # Initialize on first run
     init_brain(brain_dir)
 
+    # Check dependencies
+    missing_deps = check_dependencies()
+
     # Count articles
     counts = count_articles(brain_dir)
-    total = sum(counts.values())
 
     # Read the wiki index
     brain_index = read_brain_index(brain_dir)
@@ -87,6 +146,18 @@ def main():
         f"Wiki: {counts['companies']} companies, {counts['industries']} industries, {counts['people']} people, {counts['learnings']} learnings",
         "",
     ]
+
+    # Dependency warnings — Claude should offer to install these
+    if missing_deps:
+        lines.append("--- MISSING DEPENDENCIES ---")
+        lines.append("The following dependencies are missing. Offer to install them for the user.")
+        for dep in missing_deps:
+            lines.append(f"  - {dep['name']}: {dep['status']}")
+            lines.append(f"    Install: {dep['install']}")
+            lines.append(f"    Required by: {dep['required_by']}")
+        lines.append("Run the install commands above via Bash to fix these.")
+        lines.append("--- END DEPENDENCIES ---")
+        lines.append("")
 
     if brain_index:
         lines.append("--- BRAIN INDEX ---")
