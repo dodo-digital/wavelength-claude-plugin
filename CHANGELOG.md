@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.4.2] - 2026-05-04
+
+### Fixed
+- MCP server URL now points at the canonical OAuth endpoint `/mcp`.
+- Removed the legacy `WL_MCP_TOKEN` Authorization header from plugin MCP config so Claude Code can use OAuth.
+
 ## [1.4.1] - 2026-05-04
 
 ### Added

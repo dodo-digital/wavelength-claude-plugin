@@ -1,6 +1,6 @@
 {
   "wavelength": {
     "type": "http",
-    "url": "https://wavelength-mcp.vercel.app/api/mcp"
+    "url": "https://wavelength-mcp.vercel.app/mcp"
   }
 }
