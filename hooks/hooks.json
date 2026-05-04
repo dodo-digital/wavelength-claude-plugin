@@ -1,6 +1,17 @@
 {
-  "description": "Wavelength skill router — auto-suggests skills based on user prompts",
+  "description": "Wavelength plugin hooks — brain context injection and skill routing",
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/context/session_start.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "hooks": [

@@ -23,8 +23,21 @@ Search fund acquiring bootstrapped services businesses. This plugin automates so
 | OneDrive | File storage — thesis docs, CSV outputs |
 </stack>
 
+<brain>
+Persistent knowledge base. Injected at session start by the SessionStart hook.
+
+- **Thesis:** `context/thesis.md` — what we're looking for. Load before scoring or ranking.
+- **Sources:** `context/sources.md` — where data lives across tools (HubSpot, OneDrive, Grata, etc.).
+- **Portfolio:** `{brain_dir}/portfolio/` — company research files, one per company. Accumulated over sessions.
+- **Learnings:** `{brain_dir}/learnings/` — cross-deal insights and patterns.
+- **Thesis notes:** `{brain_dir}/thesis-notes.md` — Dino's refinements to the canonical thesis.
+
+The brain directory path is injected at session start. After analyzing a company, ask if the user wants to save findings to the brain.
+</brain>
+
 <behaviors>
-- Thesis-first. Load investment thesis docs before any scoring or ranking.
+- Thesis-first. Load `context/thesis.md` before any scoring or ranking.
+- Brain-aware. Check portfolio for prior research before analyzing a company. Save findings after analysis.
 - Validate before send. Never push contacts to Reply.io without email validation and user confirmation.
 - LinkedIn mandatory. Drop contacts without LinkedIn profiles from outreach lists.
 - Parallel over sequential. Run independent tool calls concurrently.

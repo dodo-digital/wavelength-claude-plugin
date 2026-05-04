@@ -1,6 +1,6 @@
 ---
 name: deal-analysis
-description: Analyze deals and generate investment memos for PE / search fund acquisitions. Supports full OA memo generation, section-level deep dives, weighted scorecard assessment, and deal red-teaming. Use when working with CIMs, SIMs, company documents, investment memos, or deal evaluation.
+description: Analyze deals and generate investment memos for PE / search fund acquisitions. Supports full OA memo generation, section-level deep dives, and weighted scorecard assessment. Use when working with CIMs, SIMs, company documents, investment memos, or deal evaluation. For adversarial analysis and gap detection, use /red-team instead.
 invocation: /deal-analysis
 ---
 
@@ -28,9 +28,10 @@ What would you like to do?
 1. **Generate memo** — Full investment memo or specific section(s) from deal materials
 2. **Explore deal** — Interactive deep-dive: ask questions, discuss sections, sounding board
 3. **Score deal** — Run the weighted scorecard against a company
-4. **Red team** — Stress-test the deal: tear it apart, find the weaknesses
 
 If user provides a document without specifying mode, default to **Generate memo (full)**.
+
+For adversarial analysis (stress-testing, red-teaming, gap detection), use the `/red-team` skill instead.
 </intake>
 
 <routing>
@@ -39,9 +40,9 @@ If user provides a document without specifying mode, default to **Generate memo 
 | 1, "generate", "memo", "full memo", "write", "draft" | `workflows/generate-memo.md` |
 | 2, "explore", "dive", "discuss", "explain", "sounding board", "help me understand" | `workflows/explore-deal.md` |
 | 3, "score", "scorecard", "rate", "fit", "assess" | `workflows/score-deal.md` |
-| 4, "red team", "stress test", "tear apart", "weaknesses", "what's wrong" | `workflows/red-team.md` |
 | Document uploaded without mode specified | `workflows/generate-memo.md` (full) |
 | Section name mentioned (e.g., "market overview", "financials") | `workflows/generate-memo.md` (section mode) |
+| "red team", "stress test", "what's missing" | Redirect: "That's handled by `/red-team` — want me to switch?" |
 
 **After reading the workflow, follow it exactly.**
 </routing>
@@ -55,7 +56,6 @@ If user provides a document without specifying mode, default to **Generate memo 
 - `references/right-to-win.md` — Competition and differentiation
 - `references/value-creation.md` — Investment thesis, growth opportunities, base case, ORs vs ANDs
 - `references/risk-assessment.md` — Deal Killers with mitigants and tests
-- `references/missing-items.md` — Critical gaps in disclosure
 
 **Memo and scoring:**
 - `references/memo-format.md` — OA memo sections, writing instructions, style
@@ -71,5 +71,4 @@ If user provides a document without specifying mode, default to **Generate memo 
 | generate-memo.md | Full memo or section-level generation from deal materials |
 | explore-deal.md | Interactive Q&A, sounding board, concept explanation, section drafting |
 | score-deal.md | Weighted scorecard assessment against thesis criteria |
-| red-team.md | Stress-test the investment thesis from adversarial perspectives |
 </workflows_index>

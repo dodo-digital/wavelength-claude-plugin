@@ -43,7 +43,7 @@ If user uploads a CIM without specifying, generate full memo.
 | Wavelength Scorecard | `references/scorecard.md` | Computed from gathered data |
 | Thesis | `references/value-creation.md` | Reframe as investment thesis / angle |
 | Deal Killers / Risk & Mitigants | `references/risk-assessment.md` | Prioritized DKs with mitigants + tests |
-| Next Steps | `references/missing-items.md` | Data gaps become action items |
+| Next Steps | None | Synthesize from gaps identified by other agents |
 
 ## Step 3: Deploy Sub-Agents
 
@@ -64,7 +64,6 @@ Deploy these agents in parallel:
 - **mission-criticality** agent
 - **value-creation** agent
 - **risk-assessment** agent
-- **missing-items** agent
 
 **For section-level**: Deploy only the sub-agents mapped to the requested sections.
 
