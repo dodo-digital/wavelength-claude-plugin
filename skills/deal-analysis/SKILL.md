@@ -18,6 +18,8 @@ invocation: /deal-analysis
 
 **Thesis awareness**: When scoring or assessing fit, reference the investor's thesis criteria encoded in `references/scorecard.md`. The investor focuses on specialized MSPs/MSSPs, subscription-driven businesses, and select secondary industries.
 
+**Memory-aware**: Before analyzing a named company or industry, use Wavelength MCP `query_context` to check shared memory for relevant company, industry, person, thesis, criteria, or source context. After durable memo, scorecard, diligence, or thesis findings, offer to save them with `/memory` or `update_context`; save directly if the user says remember/save/store/log/update memory.
+
 **Input flexibility**: Inputs may be a CIM/SIM PDF, partial company documents, financials, marketing materials, conversation context, or just a company description. Adapt the depth of analysis to the available information. Don't refuse to analyze when data is limited — just be explicit about what's missing.
 
 </essential_principles>

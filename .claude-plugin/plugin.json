@@ -1,6 +1,6 @@
 {
   "name": "wavelength-equity",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Deal sourcing and analysis workflows for Wavelength Equity. Automates Grata export enrichment, company scoring, contact processing, and outreach preparation for search fund acquisitions.",
   "author": {
     "name": "Dodo Digital",

@@ -19,25 +19,34 @@ Search fund acquiring bootstrapped services businesses. This plugin automates so
 | Reply.io | Outreach sequences — 10 touches per contact (email + LinkedIn) |
 | Apollo | Contact enrichment |
 | ProxyCurl | LinkedIn enrichment — owner age/tenure signals |
-| Wavelength MCP | Hosted email validation (Clearout + ZeroBounce). Tools: validate_email, zb_validate_email, bulk_validate, bulk_status, bulk_results, check_credits. API keys server-side, no local keys needed. |
+| Wavelength MCP | Hosted tools for email validation, Apollo enrichment, Reply.io, usage checks, and shared memory. Core tools include validate_email, zb_validate_email, bulk_validate, bulk_status, bulk_results, check_credits, query_context, update_context, get_skill_learnings, save_skill_learning. |
 | OneDrive | File storage — thesis docs, CSV outputs |
 </stack>
 
-<brain>
-Persistent knowledge base. Injected at session start by the SessionStart hook.
+<memory>
+Shared Wavelength memory is stored in the Wavelength MCP, not local files.
 
-- **Thesis:** `context/thesis.md` — what we're looking for. Load before scoring or ranking.
-- **Sources:** `context/sources.md` — where data lives across tools (HubSpot, OneDrive, Grata, etc.).
-- **Portfolio:** `{brain_dir}/portfolio/` — company research files, one per company. Accumulated over sessions.
-- **Learnings:** `{brain_dir}/learnings/` — cross-deal insights and patterns.
-- **Thesis notes:** `{brain_dir}/thesis-notes.md` — Dino's refinements to the canonical thesis.
+- **List/index memory:** call `query_context` with no arguments.
+- **Read a specific item:** call `query_context` with `slug` and optionally `include_history`.
+- **Search memory:** call `query_context` with `tags` or `keyword`.
+- **Save durable context:** call `update_context` with Markdown content, a canonical slug, doc_type, tags, and metadata.
 
-The brain directory path is injected at session start. After analyzing a company, ask if the user wants to save findings to the brain.
-</brain>
+Virtual memory areas:
+- `/thesis/` — thesis docs and refinements
+- `/companies/` — company research files
+- `/industries/` — industry patterns and market notes
+- `/people/` — broker, founder, operator, advisor notes
+- `/learnings/` — reusable deal patterns, exclusions, red flags
+- `/sources/` — where data lives across tools
+- `/criteria/` — scoring criteria and diligence standards
+- `/templates/` — reusable output formats
+
+Before analyzing a company or industry, check memory for prior context. After any durable deal analysis, calibration, red-team, call note, or thesis refinement, ask if the user wants to save it to memory. If the user explicitly says "remember", "save", "store", "log", or "update memory", save without asking again.
+</memory>
 
 <behaviors>
 - Thesis-first. Load `context/thesis.md` before any scoring or ranking.
-- Brain-aware. Check portfolio for prior research before analyzing a company. Save findings after analysis.
+- Memory-aware. Check MCP memory before analyzing companies, industries, people, or recurring patterns. Save durable findings after analysis.
 - Validate before send. Never push contacts to Reply.io without email validation and user confirmation.
 - LinkedIn mandatory. Drop contacts without LinkedIn profiles from outreach lists.
 - Parallel over sequential. Run independent tool calls concurrently.

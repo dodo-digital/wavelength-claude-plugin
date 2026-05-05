@@ -49,6 +49,7 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
 - **Thesis-first.** Load `references/scoring-criteria.md` before scoring. Every rating must reference specific thesis criteria.
 - **Calibrate before grinding.** Always score 10 companies first, ask targeted questions, record learnings, THEN process the rest. Never skip calibration.
 - **Learnings persist via MCP.** At the start of every run, call `get_skill_learnings` with `skill="grata-search-enrichment"` to load shared learnings from the server. Also read `## Learned Adjustments` in scoring-criteria.md for legacy local learnings. After calibration, save new insights via `save_skill_learning` — they propagate to all users automatically.
+- **Memory for durable context.** Use `query_context` to check shared memory for target-industry criteria, exclusions, and prior category patterns before scoring. Use `save_skill_learning` for narrow skill adjustments. Use `/memory` or `update_context` for broader reusable context such as industry theses, shortlist rationale, exclusion frameworks, or notable company findings.
 - **No fabrication.** If company data is insufficient for confident rating, mark MEDIUM with rationale noting uncertainty. Never invent details.
 - **Batch processing.** Process 30-50 companies per scoring pass. Accumulate results. Do not attempt all 400+ in a single prompt.
 - **Descriptors are specific.** Must fit "They do {descriptor}" and distinguish from peers. See anti-patterns in scoring-criteria.md.
@@ -67,6 +68,7 @@ This skill is UPSTREAM of company-processor — it narrows the list. Company-pro
 
 2. **Intake and load learnings** [LOW freedom]
    Load shared learnings from MCP: call `get_skill_learnings` with `skill="grata-search-enrichment"` and the target industry (once known).
+   Query shared memory with `query_context` for the target industry and relevant criteria/exclusion tags once the industry is known.
    Also load `references/scoring-criteria.md` for static thesis criteria and legacy local learnings.
 
    Use AskUserQuestion to ask:

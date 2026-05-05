@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.3] - 2026-05-04
+
+### Changed
+- Renamed the local `brain` concept to `memory` and made it explicitly MCP-backed.
+- Replaced local brain startup initialization with shared memory guidance for `query_context` and `update_context`.
+- Added memory references for save types, virtual filesystem conventions, and query policy.
+- Updated deal-analysis, red-team, Grata enrichment, and company-processor guidance to query shared memory before relevant work and save durable findings afterward.
+
 ## [1.4.2] - 2026-05-04
 
 ### Fixed

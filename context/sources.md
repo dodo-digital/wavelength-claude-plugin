@@ -31,11 +31,11 @@
 - **Access:** Microsoft connector in Claude Code. Add via Settings > Connected Tools.
 
 ## Wavelength MCP Server
-- **What:** Hosted tools for email validation and contact enrichment.
-- **Tools available:** `validate_email`, `zb_validate_email`, `bulk_validate`, `bulk_status`, `bulk_results`, `check_credits`, `apollo_enrich_person`, `apollo_search_people`, `search_reply_contacts`, `create_reply_contact`, `add_to_campaign`, `save_skill_learning`, `get_skill_learnings`, plus admin tools.
+- **What:** Hosted tools for email validation, contact enrichment, Reply.io workflows, and shared memory.
+- **Tools available:** `validate_email`, `zb_validate_email`, `bulk_validate`, `bulk_status`, `bulk_results`, `check_credits`, `apollo_enrich_person`, `apollo_bulk_enrich_people`, `apollo_enrich_org`, `apollo_search_people`, `reply_list_sequences`, `reply_search_contact`, `reply_push_contacts`, `query_context`, `update_context`, `save_skill_learning`, `get_skill_learnings`, plus admin tools.
 - **Access:** Automatically connected via plugin MCP declaration. API keys are server-side.
 
-## Brain (this plugin)
-- **What:** Persistent knowledge base. Company research, deal learnings, thesis updates.
-- **Contains:** Portfolio entries (one file per company), cross-deal learnings, thesis annotations.
-- **Access:** `/brain` skill. Files stored locally on your machine.
+## Shared Memory
+- **What:** MCP-backed shared context for Wavelength deal work.
+- **Contains:** Company notes, industry patterns, people notes, thesis updates, source references, criteria, templates, and reusable learnings.
+- **Access:** `/memory` skill. List with `query_context {}`, search by `slug`, `tags`, or `keyword`, and save with `update_context`.

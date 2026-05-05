@@ -1,5 +1,5 @@
 {
-  "description": "Wavelength plugin hooks — brain context injection and skill routing",
+  "description": "Wavelength plugin hooks — shared memory guidance and skill routing",
   "hooks": {
     "SessionStart": [
       {

@@ -16,6 +16,8 @@ invocation: /red-team
 
 **Thesis awareness**: Reference the investor's thesis criteria in `references/scorecard.md` when assessing fit. The investor focuses on specialized MSPs/MSSPs, subscription-driven businesses, and select secondary industries.
 
+**Memory-aware**: Before stress-testing a named company, industry, or thesis, use Wavelength MCP `query_context` to check shared memory for prior context. After durable risk patterns, diligence gaps, or thesis updates, offer to save them with `/memory` or `update_context`; save directly if the user says remember/save/store/log/update memory.
+
 **Input flexibility**: Inputs may be a CIM/SIM PDF, a previously generated memo, partial company documents, or conversation context. Adapt depth to available information.
 
 </essential_principles>

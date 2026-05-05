@@ -58,6 +58,7 @@ This skill is DOWNSTREAM of grata-search-enrichment — it takes the selected co
 - **Validate before send.** Never upload to Reply.io without showing preview and getting explicit user approval.
 - **Self-healing schema.** Never hardcode column positions. Discover structure each run, compare to known schema in `references/processing-rules.md`, adapt and update if changed.
 - **Learnings persist via MCP.** At the start of every run, call `get_skill_learnings` with `skill="company-processor"` to load shared learnings from the server. After each run, call `save_skill_learning` for any new insights. Learnings are shared automatically across all users — no local file edits needed.
+- **Memory for durable context.** Use `query_context` when the industry, campaign, company, source, or outreach rule may already exist in shared memory. Use `save_skill_learning` for narrow processor rules. Use `/memory` or `update_context` for broader reusable context such as source locations, outreach criteria, recurring title patterns, or durable company notes.
 - **Case rules.** Industry is broad and lowercase ("fire safety"). Business model is narrow, specific, and lowercase except acronyms ("OSHA compliance management software").
 - **Deduplicate.** After merging both exec tabs, deduplicate by email. Same person in both tabs → keep entry with more senior title.
 - **No HubSpot.** Grata syncs directly to HubSpot via its own integration. This skill handles Reply.io only.
@@ -76,6 +77,7 @@ This skill is DOWNSTREAM of grata-search-enrichment — it takes the selected co
 
 2. **Intake and load learnings** [LOW freedom]
    Load learnings from MCP: call `get_skill_learnings` with `skill="company-processor"` and the target industry (once known).
+   Query shared memory with `query_context` for relevant industry, criteria, source, and outreach-rule context once the industry or campaign is known.
    Load `references/processing-rules.md` for static rules (role filter, location parsing, business model rules).
    Load `references/field-mappings.md` for output column specs.
 

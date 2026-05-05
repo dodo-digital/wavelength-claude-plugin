@@ -61,6 +61,19 @@ def matches_pattern(text: str, pattern: str, flags: int = re.IGNORECASE) -> bool
         return False
 
 
+def matches_keyword(text: str, keyword: str) -> bool:
+    """Check if a keyword or phrase matches without substring false positives."""
+    keyword = keyword.strip().lower()
+    if not keyword:
+        return False
+
+    if re.search(r"\W", keyword):
+        return keyword in text
+
+    pattern = rf"\b{re.escape(keyword)}\b"
+    return bool(re.search(pattern, text))
+
+
 def matches_glob(file_path: str, glob_pattern: str) -> bool:
     """Check if a glob pattern matches a file path (simplified)."""
     regex_pattern = glob_pattern
@@ -111,7 +124,7 @@ def evaluate_skill(
     # 1. Check keywords
     keywords = triggers.get("keywords", [])
     for keyword in keywords:
-        if keyword.lower() in prompt_lower:
+        if matches_keyword(prompt_lower, keyword):
             score += scoring.get("keyword", 2)
             reasons.append(f'keyword "{keyword}"')
 

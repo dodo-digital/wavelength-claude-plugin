@@ -22,14 +22,13 @@ The plugin installs permanently and auto-updates when the repo is updated. No fu
 
 ### Wavelength MCP Setup
 
-The plugin connects to Wavelength's hosted MCP server for email validation (Clearout + ZeroBounce). API keys are server-side — team members only need a personal token from Dino.
+The plugin connects to Wavelength's hosted MCP server for email validation, Apollo enrichment, Reply.io workflows, and shared memory. API keys are server-side.
 
 **Claude Code users:**
 
-1. Get your token from Dino
-2. Add to your shell profile: `export WL_MCP_TOKEN="your-token"`
-3. Restart Claude Code — tools auto-connect via `.mcp.json`
-4. Test: ask Claude to run `check_credits`
+1. Install the plugin
+2. Run `/mcp` and authenticate with Microsoft when prompted
+3. Test: ask Claude to run `check_credits`
 
 **Claude Cowork users:**
 
@@ -53,10 +52,25 @@ If you use additional integrations (Reply.io, OneDrive, etc.), run:
 | `grata-search-enrichment` | Score Grata exports against thesis, generate prioritized shortlist | Drop a Grata xlsx or say "score companies" |
 | `company-processor` | Transform shortlist into Reply.io-ready contact lists | "process companies" or "prepare outreach" |
 | `deal-analysis` | Generate OA investment memos, score deals, explore deals, red-team theses | `/deal-analysis` or drop a CIM/SIM |
+| `memory` | List, query, and update shared Wavelength MCP memory | `/memory`, "what do we know", "remember this" |
 | `create-skills` | Create new Claude Code skills | `/create-skills` |
 | `create-hooks` | Create event-driven hooks | `/create-hooks` |
 
 ## Workflows
+
+### Shared Memory
+
+```
+Durable deal context / thesis update / source reference
+    ↓
+[memory]  ← saves with update_context into MCP-backed shared memory
+    ↓
+Future skill run
+    ↓
+query_context by slug, tags, or keyword before analysis
+```
+
+Memory is organized like a virtual filesystem: `/thesis`, `/companies`, `/industries`, `/people`, `/learnings`, `/sources`, `/criteria`, and `/templates`.
 
 ### Sourcing → Outreach
 
@@ -116,6 +130,7 @@ wavelength-claude-plugin/
 │   │   ├── workflows/            # generate-memo, explore, score, red-team
 │   │   ├── references/           # 10 analysis dimensions + scoring
 │   │   └── templates/            # OA memo template
+│   ├── memory/                    # MCP-backed shared memory
 │   ├── create-skills/
 │   └── create-hooks/
 ├── hooks/
