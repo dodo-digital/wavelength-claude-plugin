@@ -67,10 +67,10 @@ Durable deal context / thesis update / source reference
     ↓
 Future skill run
     ↓
-query_context by slug, tags, or keyword before analysis
+query_context by slug, tags, doc_type, or keyword before analysis
 ```
 
-Memory is organized like a virtual filesystem: `/thesis`, `/companies`, `/industries`, `/people`, `/learnings`, `/sources`, `/criteria`, and `/templates`.
+Memory is organized like a virtual filesystem: `/thesis`, `/companies`, `/industries`, `/people`, `/learnings`, `/sources`, `/criteria`, and `/templates`. Claude can call `list_context_tags` to reuse existing tags, and `query_context` supports `tag_match: "all"` for precise intersections.
 
 ### Sourcing → Outreach
 

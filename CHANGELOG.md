@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.4.4] - 2026-05-04
+
+### Changed
+- Added shared memory guidance for `list_context_tags`, `tag_match: "all"`, and `metadata.summary`.
+- Documented normalized tag namespaces and tag reuse rules so Claude does not invent avoidable duplicate tags.
+
 ## [1.4.3] - 2026-05-04
 
 ### Changed

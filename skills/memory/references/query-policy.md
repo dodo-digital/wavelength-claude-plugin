@@ -1,6 +1,6 @@
 # Memory Query Policy
 
-Use this reference when deciding whether to call `query_context`.
+Use this reference when deciding whether to call `query_context` or `list_context_tags`.
 
 ## Query First
 
@@ -26,23 +26,50 @@ Use the narrowest reliable query first:
    ```json
    {"tags":["industry/cybersecurity"]}
    {"tags":["company/acme-security"]}
-   {"tags":["skill/grata-search-enrichment","topic/exclusions"]}
+   {"tags":["skill/grata-search-enrichment","topic/exclusions"],"tag_match":"all"}
    ```
 
-3. Fuzzy question or unknown tags:
+3. Existing tag vocabulary:
+   ```json
+   {}
+   ```
+   Use `list_context_tags` with no arguments, or with a namespace:
+   ```json
+   {"namespace":"industry"}
+   ```
+
+4. Fuzzy question or unknown tags:
    ```json
    {"keyword":"founder-owned dental IT"}
    ```
 
-4. Filesystem/listing request:
+5. Filesystem/listing request:
    ```json
    {}
    ```
 
-5. Audit or "what changed" request:
+6. Audit or "what changed" request:
    ```json
    {"slug":"industry-fire-safety","include_history":true}
    ```
+
+## Tag Matching
+
+`query_context` defaults to broad tag recall:
+
+```json
+{"tags":["industry/cybersecurity","status/active"]}
+```
+
+That matches docs with either tag.
+
+Use `tag_match: "all"` for intersections:
+
+```json
+{"tags":["industry/cybersecurity","status/active"],"tag_match":"all"}
+```
+
+That matches only docs with both tags.
 
 ## Do Not Query By Default
 

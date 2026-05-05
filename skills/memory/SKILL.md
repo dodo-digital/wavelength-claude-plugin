@@ -20,8 +20,10 @@ Use this skill when the user asks what Wavelength knows, wants something remembe
 <fast_rules>
 
 - `query_context {}` lists the virtual filesystem.
+- `list_context_tags {}` lists the current tag vocabulary grouped by namespace.
 - `query_context {"slug":"..."}` reads one known item.
 - `query_context {"tags":["industry/..."]}` is best for targeted recall.
+- `query_context {"tags":["industry/...","status/..."],"tag_match":"all"}` requires every tag.
 - `query_context {"keyword":"..."}` is the fallback for fuzzy search.
 - `query_context {"slug":"...","include_history":true}` is for audit or change-history questions.
 - `update_context` saves durable synthesized context, not scratch work.
@@ -75,15 +77,16 @@ Usually do not query memory for:
 1. If the user asks for the full index, call `query_context` with `{}`.
 2. If the user names a known item, call `query_context` with its exact `slug`.
 3. If the user asks by topic, company, industry, person, skill, or source, call `query_context` with tags first.
-4. If tags are unknown or broad, call `query_context` with `keyword`.
-5. For audit/history questions, include `include_history: true` with the slug.
+4. If combining multiple tags where every tag must apply, include `tag_match: "all"`.
+5. If tags are unknown or broad, call `query_context` with `keyword`.
+6. For audit/history questions, include `include_history: true` with the slug.
 
 Examples:
 
 ```json
 {"slug":"company-acme-security","include_history":true}
 {"tags":["industry/cybersecurity"]}
-{"tags":["skill/grata-search-enrichment","topic/exclusions"]}
+{"tags":["skill/grata-search-enrichment","topic/exclusions"],"tag_match":"all"}
 {"keyword":"founder-owned dental IT"}
 ```
 
@@ -105,6 +108,8 @@ Before saving:
 - Preserve useful existing content and append/update; do not overwrite with a thin summary.
 - Use Markdown content with stable headings.
 - Add specific tags. Prefer namespaced tags over free-form tags.
+- If you are not sure which tag already exists, call `list_context_tags` before saving.
+- Include `metadata.summary` when possible; the MCP server will auto-fill it if omitted.
 
 Read `references/save-types.md` for the right doc_type, slug, tags, and content template before saving anything beyond a short note.
 

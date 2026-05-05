@@ -11,8 +11,21 @@ Every saved document should have:
 - `title`: human-readable title
 - `content`: Markdown with stable headings
 - `tags`: namespaced tags such as `company/acme-security`, `industry/cybersecurity`, `topic/exclusions`, `skill/grata-search-enrichment`
+- `metadata.summary`: one-line description for the memory index
 
 Prefer a small number of precise tags over broad catch-all tags.
+
+The MCP server normalizes tags to lowercase kebab-case and rejects unknown namespaces. Before creating a new tag for an existing concept, call `list_context_tags`.
+
+Allowed tag namespaces:
+
+- `company/{company-slug}`
+- `industry/{industry-slug}`
+- `person/{person-slug}`
+- `topic/{topic-slug}`
+- `skill/{skill-name}`
+- `source/{source-slug}`
+- `status/{status}`
 
 ## Types
 
