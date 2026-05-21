@@ -10,7 +10,21 @@ Deals are different — some are growth deals, some are value deals. Name which 
 
 ## How to Access the Document
 
-You will be given a file path (e.g., `/tmp/doc-15.pdf`). **Use the Read tool to read the file first.**
+You will be given a file path. The file may be a PDF, Word doc, PowerPoint, Excel, or text file.
+
+- **Word / Excel / PowerPoint / text / images** — use the Read tool directly.
+- **PDF** — do NOT rely on the Read tool or plain text extraction. On Windows the Read tool fails on PDFs (`pdftoppm` is not installed), and pitch decks / CIMs are graphics-heavy: text extraction misses most pages and can be actively misleading (hidden template text layers, e.g. lorem ipsum behind real slides). **Render every page to an image and Read the images** — they are the source of truth:
+
+  ```python
+  import pymupdf, os, tempfile  # run: pip install pymupdf  (if not installed)
+  doc = pymupdf.open(PDF_PATH)
+  out = os.path.join(tempfile.gettempdir(), "deck_pages")
+  os.makedirs(out, exist_ok=True)
+  for i, page in enumerate(doc):
+      page.get_pixmap(dpi=130).save(os.path.join(out, f"p{i+1:02d}.png"))
+  ```
+
+  `tempfile.gettempdir()` resolves a valid Windows path (Python ignores a bash `/tmp` path). Then Read every `pXX.png`. Convenience CLI: `scripts/render_pdf.py` in the plugin repo.
 
 ## Output Constraints
 **MAXIMUM LENGTH: 1200 words - ABSOLUTE HARD LIMIT**

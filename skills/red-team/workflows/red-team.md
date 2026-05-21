@@ -13,6 +13,8 @@
 
 Ensure CIM or company information is loaded. If a memo has already been generated in this conversation, use that as additional context — the red team should specifically challenge claims made in the memo.
 
+**If the input is a PDF deck/CIM**: render every page to an image and analyze the images — do NOT rely on the Read tool or text extraction for PDFs (the Read tool fails on PDFs on Windows; text extraction misses graphics-heavy slides and can be misleading). See `references/risk-assessment.md` → "How to Access the Document". Convenience CLI: `scripts/render_pdf.py`.
+
 If nothing is loaded: "What deal are we red-teaming? Share the CIM or tell me about the company."
 
 ## Step 2: Adopt Adversarial Personas

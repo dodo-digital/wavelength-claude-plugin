@@ -11,6 +11,8 @@
 
 Ensure CIM or company information is loaded. If a memo or red-team analysis has already been generated in this conversation, use that as additional context — flag gaps that weren't addressed.
 
+**If the input is a PDF deck/CIM**: render every page to an image and analyze the images — do NOT rely on the Read tool or text extraction for PDFs (the Read tool fails on PDFs on Windows; text extraction misses graphics-heavy slides and can be misleading). See `references/missing-items.md` → "How to Access the Document". Convenience CLI: `scripts/render_pdf.py`.
+
 If nothing is loaded: "What deal are we reviewing? Share the CIM or tell me about the company."
 
 ## Step 2: Systematic Gap Detection
